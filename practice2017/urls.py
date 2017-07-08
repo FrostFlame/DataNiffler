@@ -19,5 +19,5 @@ from itis_manage import urls as manage_urls
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    #url(r'^', include(manage_urls)),
+    url(r'^', include(manage_urls, namespace='manage_urls')),
 ]
