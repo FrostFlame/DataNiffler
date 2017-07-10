@@ -2,8 +2,11 @@ from django import forms
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.forms import widgets
+from django.db.models import Model
+from django.forms import widgets, inlineformset_factory
 from django.shortcuts import get_object_or_404
+
+from itis_manage.models import Student, NGroup, Person, Status
 
 
 class UserForm(forms.Form):
@@ -32,3 +35,49 @@ class UserForm(forms.Form):
         else:
             return False
         return valid
+
+
+class GroupForm(forms.ModelForm):
+    class Meta:
+        model = NGroup
+        fields = '__all__'
+
+
+class PersonForm(forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = '__all__'
+
+    status = forms.ModelMultipleChoiceField(queryset=Status.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('instance'):
+            statuses = kwargs['instance'].status.all()
+            super(PersonForm, self).__init__(*args, **kwargs)
+            self.fields['status'].initial = statuses
+        else:
+            super(PersonForm, self).__init__(*args, **kwargs)
+
+
+class StudentForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        exclude = ('person',)
+
+    group = forms.ModelChoiceField(queryset=NGroup.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('instance'):
+            group = kwargs['instance'].group
+            super(StudentForm, self).__init__(*args, **kwargs)
+            self.fields['group'].initial = group
+        else:
+            super(StudentForm, self).__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        if self.is_valid():
+            student = super(StudentForm, self).save(commit=False)
+            student.person = kwargs.pop('person', None)
+            student.save()
+            return student
+        raise ValidationError('Save student is incorrect')

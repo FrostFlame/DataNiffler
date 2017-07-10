@@ -14,7 +14,7 @@ def get_database(config_parser, debug):
                 'PORT': config_parser.get('TEST_DATABASE', 'PORT'),
             }
         }
-        print('Using test database')
+        print('\nUsing test database')
     else:
         DATABASES = {
             'default': {
@@ -27,5 +27,4 @@ def get_database(config_parser, debug):
                 'OPTIONS': dict(config_parser.items('DATABASE_OPTIONS')) or {}
             }
         }
-        print('Using master database')
     return DATABASES

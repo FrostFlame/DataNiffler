@@ -4,6 +4,9 @@ from django.db import models
 class Status(models.Model):
     name = models.CharField(max_length=30)
 
+    def __str__(self):
+        return self.name
+
 
 class Person(models.Model):
     email = models.CharField(max_length=50, unique=True)
@@ -11,11 +14,14 @@ class Person(models.Model):
     surname = models.CharField(max_length=40)
     third_name = models.CharField(max_length=40)
     birth_date = models.CharField(max_length=40, null=True, blank=True)
-    status = models.ManyToManyField(Status)
+    status = models.ManyToManyField(Status, related_name='status_persons')
 
 
-class Group(models.Model):
+class NGroup(models.Model):
     name = models.CharField(max_length=10)
+
+    def __str__(self):
+        return "# " + self.name
 
 
 class Student(models.Model):
@@ -24,12 +30,12 @@ class Student(models.Model):
     DEDUCTED = 'DEDUCTED'
     EXPELLED = 'EXPELLED'
 
-    TYPE_OF_STATUS = (
+    TYPE_OF_STANDING = (
         (STUDYING, 'Учится'),
         (ACADEM, 'В академическом отпуске'),
         (DEDUCTED, 'Отчислен'),
         (EXPELLED, 'Отчислился')
-     )
+    )
 
     BUDGET = 'BUDGET'
     GRANT = 'GRANT'
@@ -41,10 +47,11 @@ class Student(models.Model):
         (CONTRACT, 'Договор')
     )
 
-    status = models.CharField(choices=TYPE_OF_STATUS, default=STUDYING, max_length=14)
-    group = models.ForeignKey(Group, related_name='group_students')
+    standing = models.CharField('Статус', choices=TYPE_OF_STANDING, default=STUDYING, max_length=14)
+    group = models.ForeignKey(NGroup, related_name='group_students')
     person = models.OneToOneField(Person, related_name='person_student')
-    form_of_education = models.CharField(choices=FORM_OF_EDUCATION, default=BUDGET, max_length=8, null=True)
+    form_of_education = models.CharField('Форма обучения', choices=FORM_OF_EDUCATION, default=BUDGET, max_length=8,
+                                         null=True)
 
 
 class Subject(models.Model):
@@ -90,7 +97,7 @@ class SemesterSubject(models.Model):
     )
 
     class Meta:
-        unique_together=(('semester', 'subject'),)
+        unique_together = (('semester', 'subject'),)
 
 
 class Progress(models.Model):
@@ -114,5 +121,4 @@ class TeacherSubject(models.Model):
 
     subject = models.ForeignKey(Subject)
     person = models.ForeignKey(Person)
-    group = models.ManyToManyField(Group)
-
+    group = models.ManyToManyField(NGroup)

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Data Niffler - Add student
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ person_form.as_p }}
+        <details>
+            <summary>Форма студента</summary>
+            {{ student_form.as_p }}
+        </details>
+        <input type="hidden" id="hidden_student_form" name="student_filled" value="False"/>
+        <button type="submit" value="">Send</button>
+    </form>
+{% endblock %}

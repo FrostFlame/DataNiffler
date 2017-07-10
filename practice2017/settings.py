@@ -27,6 +27,7 @@ PRACTICE_2017_SYSTEM_PATH = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIR_NAME = os.path.dirname(__file__)
 
+
 class Base(Configuration):
     DEBUG = False
 
@@ -98,6 +99,13 @@ class Base(Configuration):
     )
     DIRNAME = DIR_NAME
     STATIC_ROOT = os.path.join(DIRNAME, 'static')
+
+
+class Master(Base):
+    config_parser.read(os.path.join(PRACTICE_2017_SYSTEM_PATH, 'practice.master.cfg'))
+    DEBUG = False
+    DATABASES = get_database(config_parser, DEBUG)
+    ALLOWED_HOSTS = "ALL"
 
 
 class Dev(Base):
