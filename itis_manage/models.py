@@ -14,6 +14,39 @@ class Person(models.Model):
     status = models.ManyToManyField(Status)
 
 
+class Group(models.Model):
+    name = models.CharField(max_length=10)
+
+
+class Student(models.Model):
+    STUDYING = 'STUDYING'
+    ACADEM = 'ACADEMIC LEAVE'
+    DEDUCTED = 'DEDUCTED'
+    EXPELLED = 'EXPELLED'
+
+    TYPE_OF_STATUS = (
+        (STUDYING, 'Учится'),
+        (ACADEM, 'В академическом отпуске'),
+        (DEDUCTED, 'Отчислен'),
+        (EXPELLED, 'Отчислился')
+     )
+
+    BUDGET = 'BUDGET'
+    GRANT = 'GRANT'
+    CONTRACT = 'CONTRACT'
+
+    FORM_OF_EDUCATION = (
+        (BUDGET, 'Бюджет'),
+        (GRANT, 'Грант'),
+        (CONTRACT, 'Договор')
+    )
+
+    status = models.CharField(choices=TYPE_OF_STATUS, default=STUDYING, max_length=14)
+    group = models.ForeignKey(Group, related_name='group_students')
+    person = models.OneToOneField(Person, related_name='person_student')
+    form_of_education = models.CharField(choices=FORM_OF_EDUCATION, default=BUDGET, max_length=8, null=True)
+
+
 class Subject(models.Model):
     name = models.CharField(max_length=30)
 
@@ -23,7 +56,7 @@ class Course(models.Model):
 
 
 class Semester(models.Model):
-    semester = models.IntegerField(max_length=2)
+    semester = models.IntegerField()
 
 
 class Laboratory(models.Model):
@@ -34,18 +67,7 @@ class Laboratory(models.Model):
 class LaboratoryRequests(models.Model):
     student = models.ForeignKey(Student, related_name='student_requests_for_labs')
     laboratory = models.ForeignKey(Laboratory, related_name='laboratory_requests')
-    is_active = models.BooleanField(null=True)
-
-
-class Group(models.Model):
-    name = models.CharField(max_length=10)
-
-
-class Student(models.Model):
-    status = models.CharField(max_length=1)
-    group = models.ForeignKey(Group, related_name='group_students')
-    person = models.OneToOneField(Person, related_name='person_student')
-    form_of_education = models.CharField(max_length=1)
+    is_active = models.NullBooleanField()
 
 
 class SemesterSubject(models.Model):
@@ -74,9 +96,9 @@ class SemesterSubject(models.Model):
 class Progress(models.Model):
     subject = models.ForeignKey(Subject)
     student = models.ForeignKey(Student)
-    semester = models.IntegerField(max_length=2)
-    practice = models.IntegerField(max_length=3)
-    exam = models.IntegerField(max_length=3)
+    semester = models.IntegerField()
+    practice = models.IntegerField()
+    exam = models.IntegerField()
 
 
 class TeacherSubject(models.Model):
@@ -93,3 +115,4 @@ class TeacherSubject(models.Model):
     subject = models.ForeignKey(Subject)
     person = models.ForeignKey(Person)
     group = models.ManyToManyField(Group)
+
