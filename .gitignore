@@ -100,3 +100,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# for macos users
+.DS_Store
