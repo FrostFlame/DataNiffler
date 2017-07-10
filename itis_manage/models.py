@@ -65,9 +65,9 @@ class Laboratory(models.Model):
 
 
 class LaboratoryRequests(models.Model):
-    student = models.ForeignKey(Student, related_name='student_requests_for_labs')
+    student = models.ForeignKey('Student', related_name='student_requests_for_labs')
     laboratory = models.ForeignKey(Laboratory, related_name='laboratory_requests')
-    is_active = models.NullBooleanField()
+    is_active = models.BooleanField(default=False)
 
 
 class SemesterSubject(models.Model):
