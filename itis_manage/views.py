@@ -6,7 +6,7 @@ from django.shortcuts import render, render_to_response as render_resp, get_obje
 from django.views.generic import View
 
 from itis_manage.forms import UserForm, StudentForm, PersonForm
-from itis_manage.lib import get_unique_object_or_none
+from itis_manage.lib import get_unique_object_or_none, person_student_save
 from itis_manage.models import Person, Student
 
 
@@ -27,17 +27,15 @@ def index(request):
     return HttpResponse("index")
 
 
-def add_person(request):
+def view_person(request, person_id=""):
     ctx = {}
     ctx['person_form'] = PersonForm()
     ctx['student_form'] = StudentForm()
-    return render(request, 'itis_manage/templates/add_student.html', ctx)
-
-
-def view_person(request, person_id):
-    ctx = {}
-    ctx['person_form'] = PersonForm()
-    ctx['student_form'] = StudentForm()
+    if person_id == '' and request.method == 'GET':
+        return render(request, 'itis_manage/templates/add_student.html', ctx)
+    elif person_id == '':
+        person = person_student_save(ctx, request)
+        return Redirect(reverse('manage:view-edit-add-student', args=(person.id,)))
     person = get_object_or_404(Person, pk=person_id)
     if request.method == 'GET':
         student = get_unique_object_or_none(Student, **{'person': person.id})
@@ -46,11 +44,5 @@ def view_person(request, person_id):
             ctx['student_form'] = StudentForm(instance=student)
     else:
         f = get_unique_object_or_none(Student, **{'person': person})
-
-        ctx['person_form'] = PersonForm(data=request.POST, instance=person)
-        ctx['student_form'] = StudentForm(data=request.POST, instance=f)
-        if ctx['person_form'].is_valid():
-            ctx['person_form'].save()
-            if ctx['student_form'].is_valid():
-                ctx['student_form'].save(**{'person': person})
+        person_student_save(ctx, request, person, f)
     return render(request, 'itis_manage/templates/add_student.html', ctx)
