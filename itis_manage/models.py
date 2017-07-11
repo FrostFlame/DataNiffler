@@ -15,6 +15,7 @@ class Person(models.Model):
     third_name = models.CharField(max_length=40)
     birth_date = models.CharField(max_length=40, null=True, blank=True)
     status = models.ManyToManyField(Status, related_name='status_persons')
+    country = models.ForeignKey('City', related_name='city_persons')
 
 
 class NGroup(models.Model):
@@ -122,3 +123,10 @@ class TeacherSubject(models.Model):
     subject = models.ForeignKey(Subject)
     person = models.ForeignKey(Person)
     group = models.ManyToManyField(NGroup)
+
+
+class City(models.Model):
+    name = models.CharField('Город', max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name

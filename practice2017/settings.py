@@ -66,7 +66,7 @@ class Base(Configuration):
         'django.contrib.staticfiles',
         # Web apps
         'itis_manage',
-
+        'itis_data_niffler',
     )
     INSTALLED_APPS = INSTALLED_APPS1
 
@@ -114,7 +114,7 @@ class Master(Base):
     config_parser.read(os.path.join(PRACTICE_2017_SYSTEM_PATH, 'practice.master.cfg'))
     DEBUG = False
     DATABASES = get_database(config_parser, DEBUG)
-    ALLOWED_HOSTS = "ALL"
+    ALLOWED_HOSTS = "host.for.deployingdotcom"
 
 
 class Dev(Base):

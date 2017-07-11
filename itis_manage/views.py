@@ -27,15 +27,18 @@ def index(request):
     return HttpResponse("index")
 
 
-def view_person(request, person_id=""):
+def view_person(request, person_id="add"):
     ctx = {}
     ctx['person_form'] = PersonForm()
     ctx['student_form'] = StudentForm()
-    if person_id == '' and request.method == 'GET':
+    if person_id == 'add' and request.method == 'GET':
         return render(request, 'itis_manage/templates/add_student.html', ctx)
-    elif person_id == '':
+    elif person_id == 'add':
         person = person_student_save(ctx, request)
-        return Redirect(reverse('manage:view-edit-add-student', args=(person.id,)))
+        if person is not None:
+            return Redirect(reverse('manage:view-edit-add-student', args=(person.id,)))
+        else:
+            return render(request, 'itis_manage/templates/add_student.html', ctx)
     person = get_object_or_404(Person, pk=person_id)
     if request.method == 'GET':
         student = get_unique_object_or_none(Student, **{'person': person.id})
