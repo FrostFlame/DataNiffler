@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect as Redirect
 from django.shortcuts import render, render_to_response as render_resp, get_object_or_404
 from django.views.generic import View
 
-from itis_manage.forms import UserForm, StudentForm, PersonForm
+from itis_manage.forms import UserForm, StudentForm, PersonForm, SimpleForm
 from itis_manage.lib import get_unique_object_or_none, person_student_save
 from itis_manage.models import Person, Student
 
@@ -46,3 +46,7 @@ def view_person(request, person_id=""):
         f = get_unique_object_or_none(Student, **{'person': person})
         person_student_save(ctx, request, person, f)
     return render(request, 'itis_manage/templates/add_student.html', ctx)
+
+
+def try_crispy_form(request):
+    return render(request, 'crispy_form_example.html', {'form': SimpleForm()})

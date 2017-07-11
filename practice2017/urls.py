@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from itis_manage import urls as manage_urls
+from itis_manage.views import try_crispy_form
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),

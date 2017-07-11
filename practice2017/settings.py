@@ -37,6 +37,8 @@ class Base(Configuration):
 
     ALLOWED_HOSTS = []
 
+    CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
     INSTALLED_APPS = (
         'django.contrib.admin',
         'django.contrib.auth',
@@ -45,6 +47,7 @@ class Base(Configuration):
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'itis_manage',
+        'crispy_forms'
     )
 
     MIDDLEWARE_CLASSES = (

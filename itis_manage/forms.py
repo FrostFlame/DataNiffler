@@ -8,6 +8,20 @@ from django.shortcuts import get_object_or_404
 
 from itis_manage.models import Student, NGroup, Person, Status
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit, Layout, Field
+
+
+class SimpleForm(forms.Form):
+    username = forms.CharField(label="Username", required=True)
+    password = forms.CharField(
+        label="Password", required=True, widget=forms.PasswordInput)
+    remember = forms.BooleanField(label="Remember Me?")
+
+    helper = FormHelper()
+    helper.form_method = 'POST'
+    helper.add_input(Submit('login', 'login', css_class='btn-primary'))
+
 
 class UserForm(forms.Form):
     username = forms.CharField(required=True, error_messages={"unf": 'User not found'})
