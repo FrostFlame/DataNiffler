@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
     Data Niffler - Login
 {% endblock %}
 
 {% block content %}
-    <form method="post">
+    {{ STATIC }}
+    <form method="post" class="form-horizontal">
         {% csrf_token %}
         {{ form }}
         <button type="submit" value="">Sign In</button>

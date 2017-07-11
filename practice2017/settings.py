@@ -94,14 +94,13 @@ class Base(Configuration):
 
     USE_TZ = True
 
-    # Static files (CSS, JavaScript, Images)
+    # Static files (CSS, JavaScript, Images, Bootstrap3)
     STATIC_URL = '/static/'
-    STATICFILES_DIRS = (
-        os.path.join(BASE_DIR, "static"),
-        '/static/',
-    )
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, 'static'),
+    ]
     DIRNAME = DIR_NAME
-    STATIC_ROOT = os.path.join(DIRNAME, 'static')
 
 
 class Master(Base):
