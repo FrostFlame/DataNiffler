@@ -27,6 +27,11 @@ PRACTICE_2017_SYSTEM_PATH = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIR_NAME = os.path.dirname(__file__)
 
+INSTALLED_APPS = (
+    'crispy_forms',
+    'widget_tweaks',
+)
+
 
 class Base(Configuration):
     DEBUG = False
@@ -38,17 +43,6 @@ class Base(Configuration):
     ALLOWED_HOSTS = []
 
     CRISPY_TEMPLATE_PACK = 'bootstrap3'
-
-    INSTALLED_APPS = (
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'itis_manage',
-        'crispy_forms'
-    )
 
     MIDDLEWARE_CLASSES = (
         'django.contrib.sessions.middleware.SessionMiddleware',
@@ -62,6 +56,19 @@ class Base(Configuration):
     )
 
     ROOT_URLCONF = 'practice2017.urls'
+
+    INSTALLED_APPS1 = INSTALLED_APPS + (
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        # Web apps
+        'itis_manage',
+
+    )
+    INSTALLED_APPS = INSTALLED_APPS1
 
     TEMPLATES = [
         {

@@ -1,15 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load widget_tweaks %}
 {% block title %}
     Data Niffler - Login
 {% endblock %}
 
 {% block content %}
-    {{ STATIC }}
-    <form method="post" class="form-horizontal">
+    <form method="post" >
         {% csrf_token %}
-        {{ form }}
-        <button type="submit" value="">Sign In</button>
+        {% for field in form.visible_fields %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field|add_class:'form-control' }}
+                {% for error in field.errors %}
+                    <span class="help-block">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="fa-sign-in" value="">Sign In</button>
     </form>
 {% endblock %}
