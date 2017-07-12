@@ -31,13 +31,13 @@ class Semester(models.Model):
 class NGroup(models.Model):
     name = models.CharField(max_length=10)
     year_of_foundation = models.IntegerField()
-    curator = models.ManyToManyField(Person, related_name='curator_group')
-
-    class Meta:
-        unique_together = (('name', 'year_of_foundation'),)
+    curator = models.ManyToManyField(Person, related_name='curator_groups')
 
     def __str__(self):
         return "#%s (%s)" % (self.name, self.year_of_foundation)
+
+    class Meta:
+        unique_together = (('name', 'year_of_foundation'),)
 
 
 class Student(models.Model):
