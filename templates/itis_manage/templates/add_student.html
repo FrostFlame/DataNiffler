@@ -5,6 +5,13 @@
 {% endblock %}
 
 {% block content %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <form method="post">
         {% csrf_token %}
         {% for field in person_form.visible_fields %}
@@ -21,6 +28,8 @@
             {{ student_form.as_p }}
         </details>
         <input type="hidden" id="hidden_student_form" name="student_filled" value="False"/>
-        <button type="submit" value="">Send</button>
+        {% if not read %}
+            <button type="submit" value="">Send</button>
+        {% endif %}
     </form>
 {% endblock %}

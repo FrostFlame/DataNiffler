@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import Model
 from django.forms import widgets, inlineformset_factory
 from django.shortcuts import get_object_or_404
-
+import datetime
 from itis_manage.models import Student, NGroup, Person, Status
 
 from crispy_forms.helper import FormHelper
@@ -63,14 +63,21 @@ class PersonForm(forms.ModelForm):
         fields = '__all__'
 
     status = forms.ModelMultipleChoiceField(queryset=Status.objects.all())
+    birth_date = forms.DateField(widget=forms.SelectDateWidget(years=Person.BIRTH_YEAR_CHOICES),
+                                 initial=datetime.date.today, label_suffix='(не обязательно)')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, readonly=False, *args, **kwargs):
         if kwargs.get('instance'):
             statuses = kwargs['instance'].status.all()
             super(PersonForm, self).__init__(*args, **kwargs)
             self.fields['status'].initial = statuses
         else:
             super(PersonForm, self).__init__(*args, **kwargs)
+        if readonly:
+            instance = getattr(self, 'instance', None)
+            if instance and instance.pk:
+                for field in self.fields:
+                    self.fields[field].widget.attrs['readonly'] = True
 
 
 class StudentForm(forms.ModelForm):
@@ -78,15 +85,20 @@ class StudentForm(forms.ModelForm):
         model = Student
         exclude = ('person',)
 
-    group = forms.ModelChoiceField(queryset=NGroup.objects.all())
+    group = forms.ModelChoiceField(queryset=NGroup.objects.all(),)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, readonly=False, *args, **kwargs):
         if kwargs.get('instance'):
             group = kwargs['instance'].group
             super(StudentForm, self).__init__(*args, **kwargs)
             self.fields['group'].initial = group
         else:
             super(StudentForm, self).__init__(*args, **kwargs)
+        if readonly:
+            instance = getattr(self, 'instance', None)
+            if instance and instance.pk:
+                for field in self.fields:
+                    self.fields[field].widget.attrs['readonly'] = True
 
     def save(self, *args, **kwargs):
         if self.is_valid():

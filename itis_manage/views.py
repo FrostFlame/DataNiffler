@@ -38,7 +38,7 @@ def view_person(request, person_id="add"):
     elif person_id == 'add':
         person = person_student_save(ctx, request)
         if person is not None:
-            return Redirect(reverse('manage:view-edit-add-student', args=(person.id,)))
+            return Redirect(reverse('manage:edit-add-delete-person', args=(person.id,)))
         else:
             return render(request, 'itis_manage/templates/add_student.html', ctx)
     person = get_object_or_404(Person, pk=person_id)

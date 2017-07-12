@@ -9,6 +9,8 @@ class Status(models.Model):
 
 
 class Person(models.Model):
+    BIRTH_YEAR_CHOICES = [year for year in range(1960, 2018)]
+
     email = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=30)
     surname = models.CharField(max_length=40)
@@ -18,10 +20,12 @@ class Person(models.Model):
     country = models.ForeignKey('City', related_name='city_persons')
 
     def __str__(self):
-        return '%s %s %s (%s)' %(self.surname, self.name, self.third_name, self.status)
+        return '%s %s %s (%s)' % (self.surname, self.name, self.third_name, self.status)
+
 
 class Semester(models.Model):
     semester = models.CharField(max_length=2)
+
 
 class NGroup(models.Model):
     name = models.CharField(max_length=10)
@@ -32,7 +36,7 @@ class NGroup(models.Model):
         unique_together = (('name', 'year_of_foundation'),)
 
     def __str__(self):
-        return "#%s (%s)" %(self.name, self.year_of_foundation)
+        return "#%s (%s)" % (self.name, self.year_of_foundation)
 
 
 class Student(models.Model):
