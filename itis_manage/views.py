@@ -1,15 +1,14 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
-from django.db.models import Avg, Sum, Max
-from django.forms import inlineformset_factory
+from django.db.models import Max
 from django.http import HttpResponse, HttpResponseRedirect as Redirect
-from django.shortcuts import render, render_to_response as render_resp, get_object_or_404
-from django.views.generic import View
-
+from django.shortcuts import render, get_object_or_404
 from itis_manage.helper import semesters
-from itis_manage.forms import UserForm, StudentForm, PersonForm, SimpleForm, GroupForm
+from itis_manage.forms import GroupForm
+from itis_manage.models import Progress, Subject, SemesterSubject, NGroup
+from itis_manage.forms import UserForm, StudentForm, PersonForm, SimpleForm, MagistrForm
 from itis_manage.lib import get_unique_object_or_none, person_student_save
-from itis_manage.models import Person, Student, Progress, Subject, SemesterSubject, NGroup
+from itis_manage.models import Person, Student, Magistrate
 
 
 def auth_login(request):
@@ -33,24 +32,27 @@ def view_person(request, person_id="add"):
     ctx = {}
     ctx['person_form'] = PersonForm()
     ctx['student_form'] = StudentForm()
+    ctx['magistr_form'] = MagistrForm()
     if person_id == 'add' and request.method == 'GET':
-        return render(request, 'itis_manage/templates/add_student.html', ctx)
+        return render(request, 'templates/add_student.html', ctx)
     elif person_id == 'add':
         person = person_student_save(ctx, request)
         if person is not None:
             return Redirect(reverse('manage:edit-add-delete-person', args=(person.id,)))
         else:
-            return render(request, 'itis_manage/templates/add_student.html', ctx)
+            return render(request, 'templates/add_student.html', ctx)
     person = get_object_or_404(Person, pk=person_id)
+    student = get_unique_object_or_none(Student, **{'person': person.id})
+    magistr = get_unique_object_or_none(Magistrate, **{'student': student.id})
     if request.method == 'GET':
-        student = get_unique_object_or_none(Student, **{'person': person.id})
         ctx['person_form'] = PersonForm(instance=person)
         if student:
             ctx['student_form'] = StudentForm(instance=student)
+        if magistr:
+            ctx['magistr_form'] = MagistrForm(instance=magistr)
     else:
-        f = get_unique_object_or_none(Student, **{'person': person})
-        person_student_save(ctx, request, person, f)
-    return render(request, 'itis_manage/templates/add_student.html', ctx)
+        person_student_save(ctx, request, person, student, magistr)
+    return render(request, 'templates/add_student.html', ctx)
 
 
 def try_crispy_form(request):

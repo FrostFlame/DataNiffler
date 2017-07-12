@@ -6,7 +6,7 @@ from django.db.models import Model
 from django.forms import widgets, inlineformset_factory
 from django.shortcuts import get_object_or_404
 import datetime
-from itis_manage.models import Student, NGroup, Person, Status
+from itis_manage.models import Student, NGroup, Person, Status, Magistrate
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Field
@@ -85,7 +85,7 @@ class StudentForm(forms.ModelForm):
         model = Student
         exclude = ('person',)
 
-    group = forms.ModelChoiceField(queryset=NGroup.objects.all(),)
+    group = forms.ModelChoiceField(queryset=NGroup.objects.all(), )
 
     def __init__(self, readonly=False, *args, **kwargs):
         if kwargs.get('instance'):
@@ -107,3 +107,25 @@ class StudentForm(forms.ModelForm):
             student.save()
             return student
         raise ValidationError('Save student is incorrect')
+
+
+class MagistrForm(forms.ModelForm):
+    class Meta:
+        model = Magistrate
+        fields = ('_from',)
+
+    def __init__(self, readonly=False, *args, **kwargs):
+        super(MagistrForm, self).__init__(*args, **kwargs)
+        if readonly:
+            instance = getattr(self, 'instance', None)
+            if instance and instance.pk:
+                for field in self.fields:
+                    self.fields[field].widget.attrs['readonly'] = True
+
+    def save(self, *args, **kwargs):
+        if self.is_valid():
+            magistr = super(MagistrForm, self).save(commit=False)
+            magistr.student = kwargs.pop('student', None)
+            magistr.save()
+            return magistr
+        raise ValidationError('Save magistr is incorrect')

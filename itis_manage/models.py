@@ -27,6 +27,7 @@ class Semester(models.Model):
     semester = models.CharField(max_length=2)
 
 
+
 class NGroup(models.Model):
     name = models.CharField(max_length=10)
     year_of_foundation = models.IntegerField()
@@ -143,3 +144,11 @@ class City(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Magistrate(models.Model):
+    _from = models.CharField('Предыдущее место обучения', max_length=60, )
+    student = models.OneToOneField(Student, related_name='magistr_student')
+
+    def __str__(self):
+        return self._from

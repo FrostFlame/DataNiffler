@@ -27,6 +27,10 @@
             <summary>Форма студента</summary>
             {{ student_form.as_p }}
         </details>
+        <details>
+            <summary>Форма магистра</summary>
+            {{ magistr_form.as_p }}
+        </details>
         <input type="hidden" id="hidden_student_form" name="student_filled" value="False"/>
         {% if not read %}
             <button type="submit" value="">Send</button>
