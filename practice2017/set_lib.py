@@ -37,6 +37,7 @@ def get_database(config_parser, debug):
 
 TABLES = {
     1: 'City',
+    2: 'Status',
 }
 
 

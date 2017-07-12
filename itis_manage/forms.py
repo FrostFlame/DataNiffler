@@ -129,3 +129,6 @@ class MagistrForm(forms.ModelForm):
             magistr.save()
             return magistr
         raise ValidationError('Save magistr is incorrect')
+
+
+

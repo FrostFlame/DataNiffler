@@ -3,6 +3,7 @@ from django.contrib import admin
 from itis_manage import urls as manage_urls
 from itis_data_niffler import urls as data_niffler_urls
 from practice2017 import set_lib
+
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^manage/', include(manage_urls, namespace='manage')),

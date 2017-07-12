@@ -94,3 +94,10 @@ def subject_rating(request):
                   {'subjects_scores': subjects_scores,
                    'subject_students_rating': subject_students_rating, 'subjects': subjects})
 
+
+def view_persons(request):
+    return None
+
+
+def index(request):
+    return None
