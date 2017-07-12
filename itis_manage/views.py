@@ -5,9 +5,9 @@ from django.http import HttpResponse, HttpResponseRedirect as Redirect
 from django.shortcuts import render, render_to_response as render_resp, get_object_or_404
 from django.views.generic import View
 
-from itis_manage.forms import UserForm, StudentForm, PersonForm, SimpleForm
+from itis_manage.forms import UserForm, StudentForm, PersonForm, SimpleForm, GroupForm
 from itis_manage.lib import get_unique_object_or_none, person_student_save
-from itis_manage.models import Person, Student
+from itis_manage.models import Person, Student, NGroup
 
 
 def auth_login(request):
@@ -53,3 +53,28 @@ def view_person(request, person_id="add"):
 
 def try_crispy_form(request):
     return render(request, 'crispy_form_example.html', {'form': SimpleForm()})
+
+
+@login_required(login_url=reverse_lazy('manage:login'))
+def add_group(request):
+    args = {'group_form': GroupForm()}
+    if request.method == 'GET':
+        return render(request, 'itis_manage/add_group.html', args)
+    if request.method == 'POST':
+        group = GroupForm(data=request.POST)
+        group.save()
+        return render(request, 'itis_manage/add_group.html', args)
+
+
+@login_required(login_url=reverse_lazy('manage:login'))
+def edit_group(request, group_id=''):
+    group = get_object_or_404(NGroup, pk=group_id)
+    args = {}
+    args['group_form'] = GroupForm(instance=group)
+    if request.method == 'GET':
+        return render(request, 'itis_manage/edit_group.html', args)
+    if request.method == 'POST':
+        group = GroupForm(request.POST, instance=group)
+        group.save()
+        return Redirect(reverse('manage:edit-group', args=(group_id,)))
+

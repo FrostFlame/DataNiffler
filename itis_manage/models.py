@@ -17,12 +17,20 @@ class Person(models.Model):
     status = models.ManyToManyField(Status, related_name='status_persons')
     country = models.ForeignKey('City', related_name='city_persons')
 
+    def __str__(self):
+        return '%s %s %s (%s)' %(self.surname, self.name, self.third_name, self.status)
+
 
 class NGroup(models.Model):
     name = models.CharField(max_length=10)
+    year_of_foundation = models.IntegerField()
+    curator = models.ManyToManyField(Person, related_name='curator_group')
+
+    class Meta:
+        unique_together = (('name', 'year_of_foundation'),)
 
     def __str__(self):
-        return "# " + self.name
+        return "#%s (%s)" %(self.name, self.year_of_foundation)
 
 
 class Student(models.Model):
@@ -55,16 +63,17 @@ class Student(models.Model):
                                          null=True)
 
 
+class Semester(models.Model):
+    semester = models.IntegerField()
+
+
 class Subject(models.Model):
     name = models.CharField(max_length=30)
+    semester = models.ManyToManyField(Semester)
 
 
 class Course(models.Model):
     subject = models.OneToOneField(Subject)
-
-
-class Semester(models.Model):
-    semester = models.IntegerField()
 
 
 class Laboratory(models.Model):
