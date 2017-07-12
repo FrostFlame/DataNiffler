@@ -20,6 +20,8 @@ class Person(models.Model):
     def __str__(self):
         return '%s %s %s (%s)' %(self.surname, self.name, self.third_name, self.status)
 
+class Semester(models.Model):
+    semester = models.CharField(max_length=2)
 
 class NGroup(models.Model):
     name = models.CharField(max_length=10)
@@ -63,12 +65,8 @@ class Student(models.Model):
                                          null=True)
 
 
-class Semester(models.Model):
-    semester = models.IntegerField()
-
-
 class Subject(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
     semester = models.ManyToManyField(Semester)
 
 
@@ -111,11 +109,13 @@ class SemesterSubject(models.Model):
 
 
 class Progress(models.Model):
-    subject = models.ForeignKey(Subject)
-    student = models.ForeignKey(Student)
-    semester = models.IntegerField()
+    semester_subject = models.ForeignKey(SemesterSubject, related_name='semester_subject_progresses')
+    student = models.ForeignKey(Student, related_name='student_progresses')
     practice = models.IntegerField()
     exam = models.IntegerField()
+
+    class Meta:
+        unique_together = (('semester_subject', 'student'),)
 
 
 class TeacherSubject(models.Model):

@@ -3,9 +3,12 @@ from itis_manage import views
 from itis_manage.views import add_group, edit_group
 
 urlpatterns = [
+    # Add = person/ , edit-delete = person/pk
+    url(r'person/(?P<person_id>(\d+)|add)$', views.view_person, name='edit-add-delete-person'),
+    url(r'crispy/$', views.try_crispy_form, name='try_crispy'),
+    url(r'common-rating/$', views.common_rating, name='cr'),
+    url(r'subject-rating/$', views.subject_rating, name='sr')
     url(r'auth/login$', views.auth_login, name='login'),
-    # Add = person/ , edit-view-delete = person/pk
-    url(r'person/(?P<person_id>(\d+)|add)$', views.view_person, name='view-edit-add-student'),
     url(r'group/add$', add_group, name='create-group'),
     url(r'group(?P<group_id>(\d+))$', edit_group, name='edit-group'),
     url(r'', views.index, name='index'),
