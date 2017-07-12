@@ -26,6 +26,9 @@ class Person(models.Model):
 class Semester(models.Model):
     semester = models.CharField(max_length=2)
 
+    def __str__(self):
+        return str(self.semester)
+
 
 
 class NGroup(models.Model):

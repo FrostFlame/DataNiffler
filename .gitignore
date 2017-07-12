@@ -109,3 +109,5 @@ ENV/
 
 # for macos users
 .DS_Store
+
+migrations
