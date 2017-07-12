@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Data Niffler - Add student
+{% endblock %}
+
+{% block content %}
+    <div align="center" style="padding-top: 30px">
+     <form method="get">
+         <label>Выберите курс</label>
+        <select name="course">
+        <option selected>1</option>
+        <option >2</option>
+            <option>3</option>
+            <option>4</option>
+        </select>
+     <input type="submit" value="Показать"/>
+     </form>
+
+        <table border="2"  width="600">
+            <tr>
+                <th>Имя</th>
+                <th>Группа</th>
+                <th>Балл</th>
+             </tr>
+            {% for score, students in common_students_score_rating %}
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.person.name }}</td>
+                    <td>{{ student.group }}</td>
+                    <td>{{ score }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}

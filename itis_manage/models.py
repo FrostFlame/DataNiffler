@@ -17,9 +17,12 @@ class Person(models.Model):
     status = models.ManyToManyField(Status, related_name='status_persons')
     country = models.ForeignKey('City', related_name='city_persons')
 
+class Semester(models.Model):
+    semester = models.CharField(max_length=2)
 
 class NGroup(models.Model):
     name = models.CharField(max_length=10)
+    semester = models.ForeignKey(Semester,related_name='semester_groups',on_delete=models.CASCADE)
 
     def __str__(self):
         return "# " + self.name
@@ -56,15 +59,13 @@ class Student(models.Model):
 
 
 class Subject(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
 
 
 class Course(models.Model):
     subject = models.OneToOneField(Subject)
 
 
-class Semester(models.Model):
-    semester = models.IntegerField()
 
 
 class Laboratory(models.Model):
@@ -102,11 +103,13 @@ class SemesterSubject(models.Model):
 
 
 class Progress(models.Model):
-    subject = models.ForeignKey(Subject)
-    student = models.ForeignKey(Student)
-    semester = models.IntegerField()
+    semester_subject = models.ForeignKey(SemesterSubject, related_name='semester_subject_progresses')
+    student = models.ForeignKey(Student, related_name='student_progresses')
     practice = models.IntegerField()
     exam = models.IntegerField()
+
+    class Meta:
+        unique_together = (('semester_subject', 'student'),)
 
 
 class TeacherSubject(models.Model):
