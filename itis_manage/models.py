@@ -23,7 +23,7 @@ class Person(models.Model):
     created_at = models.DateTimeField(default=datetime.datetime.now, auto_created=True)
 
     def __str__(self):
-        return '%s %s %s (%s)' % (self.surname, self.name, self.third_name, self.status)
+        return '%s %s %s (%s)' % (self.surname, self.name, self.third_name, [status.name for status in self.status.all()])
 
 
 class Semester(models.Model):

@@ -1,14 +1,16 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect as Redirect
-from itis_manage.models import Semester
+from itis_manage.models import Semester, Laboratory
 from itis_manage.forms import GroupForm, LaboratoryForm, LabRequestForm
 from itis_manage.models import NGroup, LaboratoryRequests
 from itis_manage.forms import MagistrForm
 from django.shortcuts import render, get_object_or_404
 from itis_manage.forms import UserForm, StudentForm, PersonForm, SimpleForm
-from itis_manage.lib import get_unique_object_or_none, person_student_save, lab_request_post
+from itis_manage.lib import get_unique_object_or_none, person_student_save, lab_post
 from itis_manage.models import Person, Student, Magistrate
+
+LOGIN_URL = reverse_lazy('data:login')
 
 
 def auth_login(request):
@@ -91,20 +93,35 @@ def add_subject(request):
         return render(request, 'itis_manage/add_subject.html', args)
 
 
-@login_required(login_url=reverse_lazy('data:login'))
+@login_required(login_url=LOGIN_URL)
 def lab_request(request, lab_id=None):
     ctx = {}
     params = {'data': request.POST}
     ctx['lab_form'] = LabRequestForm()
     if lab_id == 'add':
-        lab_request_object, ctx = lab_request_post(request, ctx, **params)
+        lab_request_object, ctx = lab_post(request, ctx, **params)
+        if lab_request_object is not None:
+            return Redirect(reverse('manage:lab-request-add-edit-delete', args=(lab_request_object.id,)))
     else:
         lab_req = get_object_or_404(LaboratoryRequests, pk=lab_id)
         params['instance'] = lab_req
         ctx['lab_form'] = LabRequestForm(instance=lab_req)
-        lab_request_object, ctx = lab_request_post(request, ctx, **params)
+        lab_request_object, ctx = lab_post(request, ctx, **params)
     return render(request, 'templates/add_lab_request.html', ctx)
 
 
+@login_required(login_url=LOGIN_URL)
 def lab_view(request, lab_id):
-    return HttpResponse('lab')
+    ctx = {}
+    params = {'data': request.POST}
+    ctx['lab_form'] = LaboratoryForm()
+    if lab_id == 'add':
+        lab_request_object, ctx = lab_post(request, ctx, form=LaboratoryForm, **params)
+        if lab_request_object is not None:
+            return Redirect(reverse('manage:add-edit-delete-lab', args=(lab_request_object.id,)))
+    else:
+        lab_req = get_object_or_404(Laboratory, pk=lab_id)
+        params['instance'] = lab_req
+        ctx['lab_form'] = LaboratoryForm(instance=lab_req)
+        lab_request_object, ctx = lab_post(request, ctx, form=LaboratoryForm, **params)
+    return render(request, 'templates/add_lab.html', ctx)

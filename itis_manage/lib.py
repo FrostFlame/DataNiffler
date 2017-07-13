@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.models import User
 
 from itis_manage.forms import PersonForm, StudentForm, MagistrForm, LabRequestForm
@@ -28,9 +29,12 @@ def person_student_save(ctx, request, person=None, student=None, magistr=None):
     return person
 
 
-def lab_request_post(request, ctx, **kwargs):
+def lab_post(request, ctx, form=LabRequestForm, **kwargs):
     lab_request_object = None
     if request.method == "POST":
-        ctx['lab_form'] = LabRequestForm(**kwargs)
-        lab_request_object = ctx['lab_form'].save()
+        ctx['lab_form'] = form(**kwargs)
+        if ctx['lab_form'].is_valid():
+            lab_request_object = ctx['lab_form'].save()
+        else:
+            messages.add_message(request, messages.ERROR, ctx['lab_form'].errors['__all__'])
     return lab_request_object, ctx
