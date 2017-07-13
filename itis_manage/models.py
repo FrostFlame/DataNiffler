@@ -1,4 +1,7 @@
+import datetime
+
 from django.db import models
+from multiselectfield import MultiSelectField
 
 
 class Status(models.Model):
@@ -17,7 +20,8 @@ class Person(models.Model):
     third_name = models.CharField(max_length=40)
     birth_date = models.CharField(max_length=40, null=True, blank=True)
     status = models.ManyToManyField(Status, related_name='status_persons')
-    country = models.ForeignKey('City', related_name='city_persons')
+    country = models.CharField('Город', max_length=50, )
+    created_at = models.DateTimeField(default=datetime.datetime.now, auto_created=True)
 
     def __str__(self):
         return '%s %s %s (%s)' % (self.surname, self.name, self.third_name, self.status)
@@ -28,7 +32,6 @@ class Semester(models.Model):
 
     def __str__(self):
         return str(self.semester)
-
 
 
 class NGroup(models.Model):
@@ -72,6 +75,9 @@ class Student(models.Model):
     form_of_education = models.CharField('Форма обучения', choices=FORM_OF_EDUCATION, default=BUDGET, max_length=8,
                                          null=True)
 
+    def __str__(self):
+        return "Студент " + self.person.__str__() + ' группа ' + self.group.__str__()
+
 
 class Subject(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -83,14 +89,34 @@ class Course(models.Model):
 
 
 class Laboratory(models.Model):
-    name = models.CharField(max_length=40)
+    name = models.CharField(max_length=40, unique=True)
     person = models.ForeignKey(Person, related_name='person_laboratories')
+
+    def __str__(self):
+        return self.name
 
 
 class LaboratoryRequests(models.Model):
+    fields = ('student',
+              'laboratory',
+              'is_active',
+              'created_at',
+              )
+
+    class Meta:
+        unique_together = (('student', 'laboratory'),)
+
     student = models.ForeignKey('Student', related_name='student_requests_for_labs')
     laboratory = models.ForeignKey(Laboratory, related_name='laboratory_requests')
     is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=datetime.datetime.now, auto_created=True)
+
+    def __str__(self):
+        return self.student.person.__str__() + 'requested to lab ' + self.laboratory.__str__() + ' on ' + str(
+            self.created_at.date())
+
+    def __is_active__(self):
+        return 'In lab' if self.is_active else 'Waiting for accept'
 
 
 class SemesterSubject(models.Model):
@@ -140,13 +166,6 @@ class TeacherSubject(models.Model):
     subject = models.ForeignKey(Subject)
     person = models.ForeignKey(Person)
     group = models.ManyToManyField(NGroup)
-
-
-class City(models.Model):
-    name = models.CharField('Город', max_length=50, unique=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Magistrate(models.Model):

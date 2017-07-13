@@ -1,9 +1,10 @@
 
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 
 from itis_manage.forms import PersonForm, StudentForm, MagistrForm
-from itis_manage.lib import get_unique_object_or_none
+from itis_manage.lib import get_unique_object_or_none, LAB_REQUEST_FIELDS
 from itis_manage.models import Person, Student, Magistrate
 
 from django.db.models import Max
@@ -100,4 +101,4 @@ def view_persons(request):
 
 
 def index(request):
-    return None
+    return HttpResponse("index")

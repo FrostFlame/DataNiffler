@@ -110,4 +110,9 @@ ENV/
 # for macos users
 .DS_Store
 
+<<<<<<< HEAD
 migrations
+=======
+migrations
+migrations/
+>>>>>>> Added lab request
