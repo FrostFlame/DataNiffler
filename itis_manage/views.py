@@ -129,3 +129,7 @@ def lab_view(request, lab_id):
 
 def lab_requests(request):
     return HttpResponse('Lab requests')
+
+
+def view_persons(request):
+    return HttpResponse('Persons')

@@ -85,9 +85,7 @@ def subject_rating(request):
                                                                                   semester_subject__subject=subject).count()
             if not subject_students_rating.get(average_student_score):
                 subject_students_rating[average_student_score] = []
-                subject_students_rating[average_student_score].append(student)
-            else:
-                subject_students_rating[average_student_score].append(student)
+            subject_students_rating[average_student_score].append(student)
     subject_students_rating = sorted(subject_students_rating.items(), key=lambda items: items[0], reverse=True)
     subjects = Subject.objects.all()
     return render(request, 'itis_data_niffler/templates/subject_rating.html',
@@ -121,3 +119,7 @@ def lab_request_view(request, lab_id):
     else:
         messages.add_message(request, messages.INFO, 'POST method not allowed here!')
     return render(request, 'templates/add_lab_request.html', ctx)
+
+
+def lab_requests(request):
+    return HttpResponse('Labs')

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
-from django.forms import ModelChoiceField, ModelMultipleChoiceField
+from django.forms import ModelChoiceField, ModelMultipleChoiceField, ChoiceField, TypedChoiceField
 
 
 def semesters(x):
@@ -22,13 +22,17 @@ def diff_month(d1, d2):
 
 def set_readable_related_fields(instance, self, ):
     for field in self.fields:
-        if isinstance(self.fields[field], (ModelChoiceField, ModelMultipleChoiceField)):
-            try:
+        try:
+            if self.fields[field].__class__ == ModelChoiceField:
                 self.fields[field].queryset = self.fields[field].queryset.filter(
                     **{'id': getattr(instance, field).id})
-            except:
-                try:
-                    self.fields[field].queryset = self.fields[field].queryset.filter(
-                        **{'id__in': getattr(instance, field).all().values('id')})
-                except:
-                    raise ValidationError('PLease Tell me about it!')
+            elif self.fields[field].__class__ == ModelMultipleChoiceField:
+                self.fields[field].queryset = self.fields[field].queryset.filter(
+                    **{'id__in': getattr(instance, field).all().values('id')})
+            elif self.fields[field].__class__ == TypedChoiceField:
+                for i in self.fields[field].choices:
+                    if i[0] == getattr(instance, field):
+                        ls = (i[0], i[1])
+                        self.fields[field].choices = [ls, ]
+        except:
+            raise ValidationError(str(self.fields[field].__class__) + ' is not a readable')

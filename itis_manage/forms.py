@@ -75,8 +75,8 @@ class PersonForm(forms.ModelForm):
         if readonly:
             instance = getattr(self, 'instance', None)
             if instance and instance.pk:
+                set_readable_related_fields(instance, self)
                 for field in self.fields:
-                    set_readable_related_fields(instance, self)
                     self.fields[field].widget.attrs['readonly'] = True
 
 
@@ -90,8 +90,8 @@ class StudentForm(forms.ModelForm):
         if readonly:
             instance = getattr(self, 'instance', None)
             if instance and instance.pk:
+                set_readable_related_fields(instance, self)
                 for field in self.fields:
-                    set_readable_related_fields(instance, self)
                     self.fields[field].widget.attrs['readonly'] = True
 
     def save(self, *args, **kwargs):
@@ -113,8 +113,8 @@ class MagistrForm(forms.ModelForm):
         if readonly:
             instance = getattr(self, 'instance', None)
             if instance and instance.pk:
+                set_readable_related_fields(instance, self)
                 for field in self.fields:
-                    set_readable_related_fields(instance, self)
                     self.fields[field].widget.attrs['readonly'] = True
 
     def save(self, *args, **kwargs):
@@ -136,8 +136,8 @@ class LaboratoryForm(forms.ModelForm):
         if readonly:
             instance = getattr(self, 'instance', None)
             if instance and instance.pk:
+                set_readable_related_fields(instance, self)
                 for field in self.fields:
-                    set_readable_related_fields(instance, self)
                     self.fields[field].widget.attrs['readonly'] = True
 
 
@@ -151,6 +151,6 @@ class LabRequestForm(forms.ModelForm):
         if readonly:
             instance = getattr(self, 'instance', None)
             if instance and instance.pk:
+                set_readable_related_fields(instance, self)
                 for field in self.fields:
-                    set_readable_related_fields(instance, self)
                     self.fields[field].widget.attrs['readonly'] = True
