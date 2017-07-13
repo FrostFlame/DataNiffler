@@ -3,21 +3,21 @@ from itis_manage import views
 from itis_manage.views import add_group, edit_group, add_subject
 
 urlpatterns = [
-    url(r'index/$', views.index, name='index'),
+    url(r'^index/$', views.index, name='index'),
 
     # Add = person/ , edit-delete = person/pk
-    url(r'person/(?P<person_id>(\d+)|add)$', views.view_person, name='edit-add-delete-person'),
-    url(r'crispy/$', views.try_crispy_form, name='try_crispy'),
+    url(r'^person/(?P<person_id>(\d+)|add)$', views.view_person, name='edit-add-delete-person'),
+    url(r'^crispy/$', views.try_crispy_form, name='try_crispy'),
 
     # Group
-    url(r'group/add$', add_group, name='create-group'),
-    url(r'group(?P<group_id>(\d+))$', edit_group, name='edit-group'),
-    url(r'subject/add$', add_subject, name='create-subject'),
+    url(r'^group/add$', add_group, name='create-group'),
+    url(r'^group(?P<group_id>(\d+))$', edit_group, name='edit-group'),
+    url(r'^subject/add$', add_subject, name='create-subject'),
 
     # Lab
-    url(r'lab/(?P<lab_id>(\d+)|add)', views.lab_view, name='add-edit-delete-lab'),
+    url(r'^lab/(?P<lab_id>(\d+)|add)$', views.lab_view, name='add-edit-delete-lab'),
 
     # Requests
-    url(r'request/lab/(?P<lab_id>(\d+)|add)', views.lab_request, name='lab-request-add-edit-delete'),
+    url(r'^request/lab/(?P<lab_id>(\d+)|add)$', views.lab_request, name='lab-request-add-edit-delete'),
 
 ]

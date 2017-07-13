@@ -106,5 +106,5 @@ def lab_request(request, lab_id=None):
     return render(request, 'templates/add_lab_request.html', ctx)
 
 
-def lab_view(request):
-    return None
+def lab_view(request, lab_id):
+    return HttpResponse('lab')
