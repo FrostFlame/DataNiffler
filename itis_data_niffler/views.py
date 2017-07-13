@@ -1,11 +1,10 @@
-
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 
-from itis_manage.forms import PersonForm, StudentForm, MagistrForm
-from itis_manage.lib import get_unique_object_or_none, LAB_REQUEST_FIELDS
-from itis_manage.models import Person, Student, Magistrate
+from itis_manage.forms import PersonForm, StudentForm, MagistrForm, LaboratoryForm, LabRequestForm
+from itis_manage.lib import get_unique_object_or_none, LAB_REQUEST_FIELDS, lab_post
+from itis_manage.models import Person, Student, Magistrate, Laboratory, LaboratoryRequests
 
 from django.db.models import Max
 from django.shortcuts import render
@@ -102,3 +101,23 @@ def view_persons(request):
 
 def index(request):
     return HttpResponse("index")
+
+
+def lab_view(request, lab_id):
+    ctx = {'read': True, 'lab_form': LaboratoryForm()}
+    if request.method == "GET":
+        lab_req = get_object_or_404(Laboratory, pk=lab_id)
+        ctx['lab_form'] = LaboratoryForm(instance=lab_req, readonly=True)
+    else:
+        messages.add_message(request, messages.INFO, 'POST method not allowed here!')
+    return render(request, 'templates/add_lab.html', ctx)
+
+
+def lab_request_view(request, lab_id):
+    ctx = {'read': True, 'lab_form': LabRequestForm()}
+    if request.method == 'GET':
+        lab_req = get_object_or_404(LaboratoryRequests, pk=lab_id)
+        ctx['lab_form'] = LabRequestForm(instance=lab_req, readonly=True)
+    else:
+        messages.add_message(request, messages.INFO, 'POST method not allowed here!')
+    return render(request, 'templates/add_lab_request.html', ctx)

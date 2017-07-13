@@ -125,3 +125,7 @@ def lab_view(request, lab_id):
         ctx['lab_form'] = LaboratoryForm(instance=lab_req)
         lab_request_object, ctx = lab_post(request, ctx, form=LaboratoryForm, **params)
     return render(request, 'templates/add_lab.html', ctx)
+
+
+def lab_requests(request):
+    return HttpResponse('Lab requests')

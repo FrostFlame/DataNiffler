@@ -1,11 +1,15 @@
+from collections import OrderedDict
+
 from django import forms
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models import Model
-from django.forms import widgets, inlineformset_factory
+from django.forms import widgets, inlineformset_factory, ModelChoiceField, ModelMultipleChoiceField
 from django.shortcuts import get_object_or_404
 import datetime
+
+from itis_data_niffler.lib import set_readable_related_fields
 from itis_manage.models import Student, NGroup, Person, Status, Magistrate, Laboratory, LaboratoryRequests
 
 from crispy_forms.helper import FormHelper
@@ -72,6 +76,7 @@ class PersonForm(forms.ModelForm):
             instance = getattr(self, 'instance', None)
             if instance and instance.pk:
                 for field in self.fields:
+                    set_readable_related_fields(instance, self)
                     self.fields[field].widget.attrs['readonly'] = True
 
 
@@ -86,6 +91,7 @@ class StudentForm(forms.ModelForm):
             instance = getattr(self, 'instance', None)
             if instance and instance.pk:
                 for field in self.fields:
+                    set_readable_related_fields(instance, self)
                     self.fields[field].widget.attrs['readonly'] = True
 
     def save(self, *args, **kwargs):
@@ -108,6 +114,7 @@ class MagistrForm(forms.ModelForm):
             instance = getattr(self, 'instance', None)
             if instance and instance.pk:
                 for field in self.fields:
+                    set_readable_related_fields(instance, self)
                     self.fields[field].widget.attrs['readonly'] = True
 
     def save(self, *args, **kwargs):
@@ -124,8 +131,26 @@ class LaboratoryForm(forms.ModelForm):
         model = Laboratory
         fields = '__all__'
 
+    def __init__(self, readonly=False, *args, **kwargs):
+        super(LaboratoryForm, self).__init__(*args, **kwargs)
+        if readonly:
+            instance = getattr(self, 'instance', None)
+            if instance and instance.pk:
+                for field in self.fields:
+                    set_readable_related_fields(instance, self)
+                    self.fields[field].widget.attrs['readonly'] = True
+
 
 class LabRequestForm(forms.ModelForm):
     class Meta:
         model = LaboratoryRequests
         fields = ('laboratory', 'student', 'is_active',)
+
+    def __init__(self, readonly=False, *args, **kwargs):
+        super(LabRequestForm, self).__init__(*args, **kwargs)
+        if readonly:
+            instance = getattr(self, 'instance', None)
+            if instance and instance.pk:
+                for field in self.fields:
+                    set_readable_related_fields(instance, self)
+                    self.fields[field].widget.attrs['readonly'] = True
