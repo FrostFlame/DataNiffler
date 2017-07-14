@@ -5,6 +5,7 @@ django-mptt==0.8.7
 django-nose==1.4.4
 django-qsstats-magic==0.7.2
 django-tellme==0.6.3
+django-autocomplete-light
 patterns==0.3
 Pillow==4.1.1
 psycopg2==2.7.1

@@ -16,6 +16,8 @@ DIR_NAME = os.path.dirname(__file__)
 INSTALLED_APPS = (
     'crispy_forms',
     'widget_tweaks',
+    'dal',
+    'dal_select2',
 )
 
 

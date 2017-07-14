@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from dal import autocomplete
 from django import forms
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -59,6 +60,9 @@ class GroupForm(forms.ModelForm):
     class Meta:
         model = NGroup
         fields = '__all__'
+        widgets = {
+            'curator': autocomplete.ModelSelect2(url='manage:ajax-curators')
+        }
 
 
 class PersonForm(forms.ModelForm):

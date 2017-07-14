@@ -37,5 +37,10 @@
 
         {% endblock %}
     </div>
+    {% block footer %}
+        {% if form %}
+            {{ form.media }}
+        {% endif %}
+    {% endblock %}
 </body>
 </html>

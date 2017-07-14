@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from itis_manage import views
 from itis_manage.views import add_subject, AddGroupView, EditGroupView
+from itis_manage.views_ajax import CuratorAutocompleteView
 
 urlpatterns = [
     url(r'^index/$', views.index, name='index'),
@@ -21,4 +22,6 @@ urlpatterns = [
     # Requests
     url(r'^request/lab/(?P<lab_id>(\d+)|add)$', views.lab_request, name='lab-request-add-edit-delete'),
     url(r'^request/labs$', views.lab_requests, name='lab-requests'),
+
+    url(r'^ajax/curators', CuratorAutocompleteView.as_view(), name='ajax-curators')
 ]

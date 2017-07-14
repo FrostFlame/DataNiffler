@@ -71,7 +71,7 @@ def try_crispy_form(request):
 
 class AddGroupView(CreateView, CustomLoginRequiredMixin):
     model = NGroup
-    fields = '__all__'
+    form_class = GroupForm
     template_name = 'templates/add_group.html'
 
     def get_success_url(self):
