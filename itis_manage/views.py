@@ -74,6 +74,9 @@ class AddGroupView(CreateView, CustomLoginRequiredMixin):
     fields = '__all__'
     template_name = 'templates/add_group.html'
 
+    def get_success_url(self):
+        return reverse_lazy('manage:edit-group', args=(self.object.id,))
+
 
 class EditGroupView(UpdateView, CustomLoginRequiredMixin):
     model = NGroup
