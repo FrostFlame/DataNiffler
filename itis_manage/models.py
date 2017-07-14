@@ -1,4 +1,5 @@
 import datetime
+from functools import reduce
 
 from django.db import models
 
@@ -42,7 +43,7 @@ class Person(models.Model):
 
     def __str__(self):
         return '%s %s %s (%s)' % (
-            self.surname, self.name, self.third_name, [status.name for status in self.status.all()])
+            self.surname, self.name, self.third_name, reduce(lambda a, x: str(a) + ', ' + str(x), self.status.all()))
 
 
 class Semester(models.Model):
