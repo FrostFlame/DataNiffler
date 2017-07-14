@@ -26,7 +26,7 @@ urlpatterns = [
 
     # Ajax requests
     url(r'^ajax/cities$', GetCities.as_view(**{'model': City}), name='ajax-cities'),
-    url(r'^ajax/curators$', CuratorAutocompleteView.as_view(**{'status': 'Куратор'}), name='ajax-curators'),
+    url(r'^ajax/curators$', CuratorAutocompleteView.as_view(), name='ajax-curators'),
     url(r'^ajax/statuses$', GetStatuses.as_view(**{'model': Status}), name='ajax-statuses'),
 
 ]

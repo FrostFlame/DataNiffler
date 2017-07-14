@@ -14,5 +14,4 @@ class GetStatuses(autocomplete.Select2QuerySetView, CustomLoginRequiredMixin):
 
 
 class CuratorAutocompleteView(autocomplete.Select2QuerySetView, CustomLoginRequiredMixin):
-    status = None
-    queryset = Person.objects.filter(status__name=status)
+    queryset = Person.objects.filter(status__name="Куратор")
