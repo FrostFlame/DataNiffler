@@ -30,4 +30,6 @@ urlpatterns = [
     url(r'^ajax/curators$', CuratorAutocompleteView.as_view(), name='ajax-curators'),
     url(r'^ajax/statuses$', GetObjects.as_view(**{'model': Status}), name='ajax-statuses'),
     url(r'^ajax/students$', GetObjects.as_view(**{'model': Student}), name='ajax-students'),
+    url(r'^get_teachers/$', views.teachers_ajax, name='teacher-ajax'),
+
 ]

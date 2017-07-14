@@ -1,7 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect as Redirect
+from django.http import JsonResponse
+from itis_manage.models import Semester, Laboratory, Subject, SemesterSubject, Course, Status
 from django.views.generic import FormView, CreateView, UpdateView
 
 from itis_manage.models import Semester, Laboratory
@@ -87,12 +90,47 @@ class EditGroupView(CustomLoginRequiredMixin, UpdateView):
         return reverse_lazy('manage:edit-group', args=(self.object.id,))
 
 
-@login_required(login_url=reverse_lazy('manage:login'))
+@login_required(login_url=reverse_lazy('data:login'))
 def add_subject(request):
     args = {}
     args['semesters'] = Semester.objects.all()
+    teacher_status = Status.objects.get(name='Препод')
+    args['teachers'] = Person.objects.filter(status=teacher_status)
     if request.method == 'GET':
         return render(request, 'itis_manage/add_subject.html', args)
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        new_subject = Subject(name=name)
+        new_subject.save()
+        semesters = list(map(int, request.POST.getlist('semesters')))
+
+        for i in range(len(semesters)):
+            semester_obj = Semester.objects.get(semester=semesters[i])
+            exam = request.POST.get('exam' + i)
+            type = request.POST.get('type' + i)
+            additional_points = request.POST.get('dopballable' + i)
+
+            sem_subj = SemesterSubject(semester=semester_obj,
+                                       subject=new_subject,
+                                       type_of_exam=exam,
+                                       additional_points=additional_points)
+            sem_subj.save()
+
+        if request.POST.get('is_course') == 'on':
+            course = Course(subject=new_subject)
+            course.save()
+
+        return Redirect(reverse('manage:create-subject'))
+
+
+def teachers_ajax(request):
+    name = request.GET.get('name', '')
+    qs = Person.objects.all()
+    for term in name.split():
+        qs = qs.filter(Q(name__icontains=term) | Q(surname__icontains=term) | Q(third_name__icontains=term))\
+            .values('id', 'name', 'surname', 'third_name')
+    print(qs)
+    return JsonResponse({'res': list(qs)})
 
 
 @login_required(login_url=LOGIN_URL)

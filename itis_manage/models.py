@@ -100,7 +100,6 @@ class Student(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=30, unique=True)
-    semester = models.ManyToManyField(Semester)
 
 
 class Course(models.Model):
@@ -156,6 +155,7 @@ class SemesterSubject(models.Model):
         choices=TYPE_OF_EXAM_CHOICES,
         default=EXAM
     )
+    additional_points = models.NullBooleanField()
 
     class Meta:
         unique_together = (('semester', 'subject'),)

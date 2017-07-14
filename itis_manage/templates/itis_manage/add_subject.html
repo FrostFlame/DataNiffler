@@ -45,12 +45,27 @@
                     },
                     'type': 'get',
                     'success': function (json) {
-                        alert(json);
-                        {#                                for (var i = 0, len = json.length; i < len; i++) {#}
-                        {#                                    build_post_block(json[i]);#}
-                        {#                                }#}
+                        for (var i = 0, len = json['res'].length; i < len; i++) {
+                            build_results(i, json['res'][i]);
+                        }
                     }
                 })
+            }
+
+            function build_results(i, json) {
+                var full_name = json['surname'] + ' ' + json['name'] + ' ' + json['third_name'];
+
+{#                todo solve this problem with set #}
+                var added_set = new Set();
+                if (added_set.has(full_name)) {
+                    alert('has!');
+                }
+                else {
+                    added_set.add(full_name);
+                    var line = $('<p></p>').text(full_name);
+                    line.attr('id', 'teacher_line' + i);
+                    $('#results' + i).append(line);
+                }
             }
 
             function whenSelected() {
@@ -62,6 +77,7 @@
                     $('.toAppend').append($('<label></label>').text('Преподаватель:'));
                     $('.toAppend').append($('<br>'));
                     var teacher_search = $('<input type="text">').attr('id', 'teacher' + i).attr('name', 'teacher' + i);
+                    var results = $('<div></div>').attr('id', 'results' + i);
 
                     var type_select = $('<select></select>').attr('id', 'type' + i).attr('name', 'type' + i);
                     type_select.append($('<option disable select value style="display:none">Выберите тип</option>'));
@@ -69,30 +85,16 @@
                     type_select.append($('<option value=2>Практика</option>'));
                     type_select.append($('<option value=3>Лекция и практика</option>'));
 
-                    {#                    var teacher_select = $('<select></select>').attr('id', 'teacher' + i).attr('name', 'teacher' + i);#}
-                    {#                    {% for teacher in teachers %}#}
-                    {#                        type_select.append($('<option value={{ teacher.id }}>{{ teacher.surname }} {{ teacher.name }} {{ teacher.third_name }}</option>'));#}
-                    {#                    {% endfor %}#}
-
-                    {#                    var exam_select = $('<select></select>').attr('id', 'exam'+i).attr('name', 'exam' + i);#}
-                    {#                    exam_select.append($('<option disable select value style="display:none">Выберите тип</option>'));#}
-                    {#                    exam_select.append($('<option value=1>Экзамен</option>'));#}
-                    {#                    exam_select.append($('<option value=2>Недиф. зачет</option>'));#}
-                    {#                    exam_select.append($('<option value=3>Диф. зачет</option>'));#}
-
 
                     $('.toAppend').append($('<h3></h3>').text('Семестр №' + item));
                     $('.toAppend').append(teacher_search);
-                    $('.toAppend').append($('<div></div>').attr('id', 'results' + i));
+                    $('.toAppend').append(results);
 
                     $('.toAppend').append($('<br>'));
                     $('.toAppend').append($('<label></label>').text('Тип предмета'));
                     $('.toAppend').append(type_select);
                     $('.toAppend').append($('<br>'));
 
-
-                    {#                    $('.toAppend').append($('<label></label>').text('Тип итоговой аттестации'));#}
-                    {#                    $('.toAppend').append(exam_select);#}
 
                     $('.toAppend').append($('<br>'));
                     $('.toAppend').append($('<label></label>').text('Можно накидать доп. баллы '));
@@ -105,26 +107,6 @@
                         var value = $('#teacher' + i).val();
                         getTeachers(value);
                     });
-
-                    $('#type' + i).change(function () {
-                        $('#toAppend' + i).empty();
-                        var sel = $('#type' + i).val();
-                        if (sel < 3) {
-                            $('#toAppend' + i).append($('<label></label>').text('Количество занятий'));
-                            $('#toAppend' + i).append($('<input type="number">').attr('name', 'lessons' + i));
-                        }
-                        if (sel == 3) {
-                            $('#toAppend' + i).append($('<label></label>').text('Количество лекций'));
-                            $('#toAppend' + i).append($('<input type="number">').attr('name', 'lectures' + i));
-                            $('#toAppend' + i).append($('<br>'));
-                            $('#toAppend' + i).append($('<label></label>').text('Количество практик'));
-                            $('#toAppend' + i).append($('<input type="number">').attr('name', 'practices' + i));
-                        }
-                    });
-
-                    {#                    $('#type' + i).focus(function () {#}
-                    {#                        $('#toAppend' + i).empty();#}
-                    {#                    });#}
 
 
                 });
