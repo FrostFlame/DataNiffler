@@ -1,6 +1,9 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect as Redirect
+from django.views.generic import FormView, CreateView, UpdateView
+
 from itis_manage.models import Semester, Laboratory
 from itis_manage.forms import GroupForm, LaboratoryForm, LabRequestForm
 from itis_manage.models import NGroup, LaboratoryRequests
@@ -11,6 +14,10 @@ from itis_manage.lib import get_unique_object_or_none, person_student_save, lab_
 from itis_manage.models import Person, Student, Magistrate
 
 LOGIN_URL = reverse_lazy('data:login')
+
+
+class CustomLoginRequiredMixin(LoginRequiredMixin):
+    login_url = LOGIN_URL
 
 
 def auth_login(request):
@@ -45,13 +52,14 @@ def view_person(request, person_id="add"):
             return render(request, 'templates/add_student.html', ctx)
     person = get_object_or_404(Person, pk=person_id)
     student = get_unique_object_or_none(Student, **{'person': person.id})
-    magistr = get_unique_object_or_none(Magistrate, **{'student': student.id})
+    magistr = get_unique_object_or_none(Magistrate, **{'student': student.id if student else None})
+
     if request.method == 'GET':
         ctx['person_form'] = PersonForm(instance=person)
         if student:
             ctx['student_form'] = StudentForm(instance=student)
-        if magistr:
-            ctx['magistr_form'] = MagistrForm(instance=magistr)
+            if magistr:
+                ctx['magistr_form'] = MagistrForm(instance=magistr)
     else:
         person_student_save(ctx, request, person, student, magistr)
     return render(request, 'templates/add_student.html', ctx)
@@ -61,28 +69,16 @@ def try_crispy_form(request):
     return render(request, 'crispy_form_example.html', {'form': SimpleForm()})
 
 
-@login_required(login_url=reverse_lazy('data:login'))
-def add_group(request):
-    args = {'group_form': GroupForm()}
-    if request.method == 'GET':
-        return render(request, 'itis_manage/add_group.html', args)
-    if request.method == 'POST':
-        group = GroupForm(data=request.POST)
-        group.save()
-        return render(request, 'itis_manage/add_group.html', args)
+class AddGroupView(CreateView, CustomLoginRequiredMixin):
+    model = NGroup
+    fields = '__all__'
+    template_name = 'templates/add_group.html'
 
 
-@login_required(login_url=reverse_lazy('data:login'))
-def edit_group(request, group_id=''):
-    group = get_object_or_404(NGroup, pk=group_id)
-    args = {}
-    args['group_form'] = GroupForm(instance=group)
-    if request.method == 'GET':
-        return render(request, 'itis_manage/edit_group.html', args)
-    if request.method == 'POST':
-        group = GroupForm(request.POST, instance=group)
-        group.save()
-        return Redirect(reverse('manage:edit-group', args=(group_id,)))
+class EditGroupView(UpdateView, CustomLoginRequiredMixin):
+    model = NGroup
+    fields = '__all__'
+    template_name = 'templates/add_group.html'
 
 
 @login_required(login_url=reverse_lazy('manage:login'))
