@@ -28,6 +28,18 @@ class SimpleForm(forms.Form):
     helper.add_input(Submit('login', 'login', css_class='btn-primary'))
 
 
+class ReadOnlySupportMixin(object):
+    def __init__(self, readonly=False, *args, **kwargs):
+        super(ReadOnlySupportMixin, self).__init__(*args, **kwargs)
+        if readonly:
+            self.readonly = True
+            instance = getattr(self, 'instance', None)
+            if instance and instance.pk:
+                set_readable_related_fields(instance, self)
+                for field in self.fields:
+                    self.fields[field].disabled = True
+
+
 class UserForm(forms.Form):
     username = forms.CharField(required=True, error_messages={"unf": 'User not found'})
     password = forms.CharField(required=True, widget=widgets.PasswordInput, min_length=6, max_length=100,
@@ -65,7 +77,7 @@ class GroupForm(forms.ModelForm):
         }
 
 
-class PersonForm(forms.ModelForm):
+class PersonForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = Person
         fields = '__all__'
@@ -74,29 +86,11 @@ class PersonForm(forms.ModelForm):
     birth_date = forms.DateField(widget=forms.SelectDateWidget(years=Person.BIRTH_YEAR_CHOICES),
                                  initial=datetime.date.today, label_suffix='(не обязательно)')
 
-    def __init__(self, readonly=False, *args, **kwargs):
-        super(PersonForm, self).__init__(*args, **kwargs)
-        if readonly:
-            instance = getattr(self, 'instance', None)
-            if instance and instance.pk:
-                set_readable_related_fields(instance, self)
-                for field in self.fields:
-                    self.fields[field].widget.attrs['readonly'] = True
 
-
-class StudentForm(forms.ModelForm):
+class StudentForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = Student
         exclude = ('person',)
-
-    def __init__(self, readonly=False, *args, **kwargs):
-        super(StudentForm, self).__init__(*args, **kwargs)
-        if readonly:
-            instance = getattr(self, 'instance', None)
-            if instance and instance.pk:
-                set_readable_related_fields(instance, self)
-                for field in self.fields:
-                    self.fields[field].widget.attrs['readonly'] = True
 
     def save(self, *args, **kwargs):
         if self.is_valid():
@@ -107,19 +101,10 @@ class StudentForm(forms.ModelForm):
         raise ValidationError('Save student is incorrect')
 
 
-class MagistrForm(forms.ModelForm):
+class MagistrForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = Magistrate
         fields = ('_from',)
-
-    def __init__(self, readonly=False, *args, **kwargs):
-        super(MagistrForm, self).__init__(*args, **kwargs)
-        if readonly:
-            instance = getattr(self, 'instance', None)
-            if instance and instance.pk:
-                set_readable_related_fields(instance, self)
-                for field in self.fields:
-                    self.fields[field].widget.attrs['readonly'] = True
 
     def save(self, *args, **kwargs):
         if self.is_valid():
@@ -130,31 +115,13 @@ class MagistrForm(forms.ModelForm):
         raise ValidationError('Save magistr is incorrect')
 
 
-class LaboratoryForm(forms.ModelForm):
+class LaboratoryForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = Laboratory
         fields = '__all__'
 
-    def __init__(self, readonly=False, *args, **kwargs):
-        super(LaboratoryForm, self).__init__(*args, **kwargs)
-        if readonly:
-            instance = getattr(self, 'instance', None)
-            if instance and instance.pk:
-                set_readable_related_fields(instance, self)
-                for field in self.fields:
-                    self.fields[field].widget.attrs['readonly'] = True
 
-
-class LabRequestForm(forms.ModelForm):
+class LabRequestForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = LaboratoryRequests
         fields = ('laboratory', 'student', 'is_active',)
-
-    def __init__(self, readonly=False, *args, **kwargs):
-        super(LabRequestForm, self).__init__(*args, **kwargs)
-        if readonly:
-            instance = getattr(self, 'instance', None)
-            if instance and instance.pk:
-                set_readable_related_fields(instance, self)
-                for field in self.fields:
-                    self.fields[field].widget.attrs['readonly'] = True

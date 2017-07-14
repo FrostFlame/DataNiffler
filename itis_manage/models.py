@@ -114,7 +114,7 @@ class Laboratory(models.Model):
         return self.name
 
 
-class LaboratoryRequests(models.Model):
+class LaboratoryRequests(models.Model):  # TODO this is a single request
     fields = ('student',
               'laboratory',
               'is_active',

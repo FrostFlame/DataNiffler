@@ -9,7 +9,9 @@
         {% endfor %}
     </div>
 {% endfor %}
-<div class="form-group">
-    <!-- TODO move that to the calling template? -->
-    <input type="submit" class="btn btn-primary" value="Send">
-</div>
+{% if not form.readonly %}
+    <div class="form-group">
+        <!-- TODO move that to the calling template? -->
+        <input type="submit" class="btn btn-primary" value="Send">
+    </div>
+{% endif %}

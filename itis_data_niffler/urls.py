@@ -16,10 +16,10 @@ urlpatterns = [
     url(r'^subject-rating/$', views.subject_rating, name='subject-rating'),
 
     # Lab
-    url(r'^lab/(?P<lab_id>(\d+)|add)$', views.lab_view, name='add-edit-delete-lab'),
+    url(r'^lab/(?P<lab_id>(\d+))$', views.lab_view, name='add-edit-delete-lab'),
 
     # Requests
-    url(r'^request/lab/(?P<lab_id>(\d+)|add)$', views.lab_request_view, name='lab-request-add-edit-delete'),
+    url(r'^request/lab/(?P<lab_id>(\d+))$', views.lab_request_view, name='lab-request-add-edit-delete'),
     url(r'^request/labs$', views.lab_requests, name='lab-requests'),
 
     # Index
