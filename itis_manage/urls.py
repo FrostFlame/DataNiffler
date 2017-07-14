@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from itis_manage import views
+from itis_manage.models import Student
 from itis_manage.views import add_subject, AddGroupView, EditGroupView
 from itis_manage.ajax import *
 from itis_manage.views import add_subject
@@ -25,8 +26,8 @@ urlpatterns = [
     url(r'^request/labs$', views.lab_requests, name='lab-requests'),
 
     # Ajax requests
-    url(r'^ajax/cities$', GetCities.as_view(**{'model': City}), name='ajax-cities'),
+    url(r'^ajax/cities$', GetObjects.as_view(**{'model': City}), name='ajax-cities'),
     url(r'^ajax/curators$', CuratorAutocompleteView.as_view(), name='ajax-curators'),
-    url(r'^ajax/statuses$', GetStatuses.as_view(**{'model': Status}), name='ajax-statuses'),
-
+    url(r'^ajax/statuses$', GetObjects.as_view(**{'model': Status}), name='ajax-statuses'),
+    url(r'^ajax/students$', GetObjects.as_view(**{'model': Student}), name='ajax-students'),
 ]

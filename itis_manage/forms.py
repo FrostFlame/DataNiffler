@@ -136,3 +136,5 @@ class LabRequestForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = LaboratoryRequests
         fields = ('laboratory', 'student', 'is_active',)
+        widgets = {
+            'student': autocomplete.ModelSelect2(url='manage:ajax-students')}
