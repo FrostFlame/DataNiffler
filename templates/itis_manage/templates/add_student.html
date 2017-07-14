@@ -4,6 +4,18 @@
     Data Niffler - Add student
 {% endblock %}
 
+{% block script %}
+{% endblock %}
+
+{% block jquery %}
+
+{% endblock %}
+
+
+
+
+
+
 {% block content %}
     {% if messages %}
         <ul class="messages">
@@ -12,7 +24,7 @@
             {% endfor %}
         </ul>
     {% endif %}
-    <form method="post">
+    <form method="post" class="form">
         {% csrf_token %}
         {% for field in person_form.visible_fields %}
             <div class="form-group">

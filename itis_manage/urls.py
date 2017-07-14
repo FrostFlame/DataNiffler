@@ -3,6 +3,9 @@ from itis_manage import views
 from itis_manage.views import add_subject, AddGroupView, EditGroupView
 from itis_manage.views_ajax import CuratorAutocompleteView
 
+from itis_manage.views import add_subject
+from itis_manage.ajax import GetCities
+
 urlpatterns = [
     url(r'^index/$', views.index, name='index'),
 
@@ -23,5 +26,7 @@ urlpatterns = [
     url(r'^request/lab/(?P<lab_id>(\d+)|add)$', views.lab_request, name='lab-request-add-edit-delete'),
     url(r'^request/labs$', views.lab_requests, name='lab-requests'),
 
+    # Ajax requests
+    url(r'^ajax/cities$', GetCities.as_view(), 'get-cities'),
     url(r'^ajax/curators', CuratorAutocompleteView.as_view(), name='ajax-curators')
 ]

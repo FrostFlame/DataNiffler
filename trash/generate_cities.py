@@ -2,7 +2,7 @@ import os
 import sys
 
 
-def generate(file_name):
+def generate(file_name, city=False):
     f = open_file(file_name)
     try:
         model_class = getattr(sys.modules['itis_manage.models'], file_name)
