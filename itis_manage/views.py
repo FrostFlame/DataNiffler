@@ -69,7 +69,7 @@ def try_crispy_form(request):
     return render(request, 'crispy_form_example.html', {'form': SimpleForm()})
 
 
-class AddGroupView(CreateView, CustomLoginRequiredMixin):
+class AddGroupView(CustomLoginRequiredMixin, CreateView):
     model = NGroup
     form_class = GroupForm
     template_name = 'templates/add_group.html'
@@ -78,10 +78,13 @@ class AddGroupView(CreateView, CustomLoginRequiredMixin):
         return reverse_lazy('manage:edit-group', args=(self.object.id,))
 
 
-class EditGroupView(UpdateView, CustomLoginRequiredMixin):
+class EditGroupView(CustomLoginRequiredMixin, UpdateView):
     model = NGroup
-    fields = '__all__'
+    form_class = GroupForm
     template_name = 'templates/add_group.html'
+
+    def get_success_url(self):
+        return reverse_lazy('manage:edit-group', args=(self.object.id,))
 
 
 @login_required(login_url=reverse_lazy('manage:login'))

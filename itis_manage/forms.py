@@ -73,7 +73,7 @@ class GroupForm(forms.ModelForm):
         model = NGroup
         fields = '__all__'
         widgets = {
-            'curator': autocomplete.ModelSelect2(url='manage:ajax-curators')
+            'curator': autocomplete.ModelSelect2Multiple(url='manage:ajax-curators')
         }
 
 
