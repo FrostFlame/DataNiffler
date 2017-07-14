@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Data Niffler - Edit group
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ group_form.as_p }}
+        <button type="submit" value="">Save</button>
+    </form>
+{% endblock %}

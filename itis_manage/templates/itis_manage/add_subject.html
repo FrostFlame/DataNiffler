@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Data Niffler - Add subject
+{% endblock %}
+
+{% block content %}
+    <h1>Добавление предмета</h1>
+    <form method="post" id="post_form">
+        {% csrf_token %}
+        <label for="name_input">Название предмате</label>
+        <input type="text" name="name" id="name_input">
+        <br>
+
+
+        <label for="semesters_select">В каком семестре преподается?</label>
+        <select multiple="multiple" id="semesters_select" name="semesters" onselect="whenSelected()">
+            {% for sem in semesters %}
+                <option value='{{ sem }}'>{{ sem }}</option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <label for="is_course_label">Курс по выбору?</label>
+        <input type="checkbox" name="is_course" id="is_course_label">
+
+        <br>
+
+        <div class="toAppend"></div>
+        <script>
+            $('#semesters_select').focusout(function () {
+                whenSelected();
+            });
+
+            $('#semesters_select').focus(function () {
+                $('.toAppend').empty();
+            });
+
+            function getTeachers(value) {
+                $.ajax({
+                    'url': '/manage/get_teachers/',
+                    'data': {
+                        'name': value
+                    },
+                    'type': 'get',
+                    'success': function (json) {
+                        alert(json);
+                        {#                                for (var i = 0, len = json.length; i < len; i++) {#}
+                        {#                                    build_post_block(json[i]);#}
+                        {#                                }#}
+                    }
+                })
+            }
+
+            function whenSelected() {
+                var semesters = $("#semesters_select").val();
+
+                semesters.forEach(function (item, i, arr) {
+
+
+                    $('.toAppend').append($('<label></label>').text('Преподаватель:'));
+                    $('.toAppend').append($('<br>'));
+                    var teacher_search = $('<input type="text">').attr('id', 'teacher' + i).attr('name', 'teacher' + i);
+
+                    var type_select = $('<select></select>').attr('id', 'type' + i).attr('name', 'type' + i);
+                    type_select.append($('<option disable select value style="display:none">Выберите тип</option>'));
+                    type_select.append($('<option value=1>Лекция</option>'));
+                    type_select.append($('<option value=2>Практика</option>'));
+                    type_select.append($('<option value=3>Лекция и практика</option>'));
+
+                    {#                    var teacher_select = $('<select></select>').attr('id', 'teacher' + i).attr('name', 'teacher' + i);#}
+                    {#                    {% for teacher in teachers %}#}
+                    {#                        type_select.append($('<option value={{ teacher.id }}>{{ teacher.surname }} {{ teacher.name }} {{ teacher.third_name }}</option>'));#}
+                    {#                    {% endfor %}#}
+
+                    {#                    var exam_select = $('<select></select>').attr('id', 'exam'+i).attr('name', 'exam' + i);#}
+                    {#                    exam_select.append($('<option disable select value style="display:none">Выберите тип</option>'));#}
+                    {#                    exam_select.append($('<option value=1>Экзамен</option>'));#}
+                    {#                    exam_select.append($('<option value=2>Недиф. зачет</option>'));#}
+                    {#                    exam_select.append($('<option value=3>Диф. зачет</option>'));#}
+
+
+                    $('.toAppend').append($('<h3></h3>').text('Семестр №' + item));
+                    $('.toAppend').append(teacher_search);
+                    $('.toAppend').append($('<div></div>').attr('id', 'results' + i));
+
+                    $('.toAppend').append($('<br>'));
+                    $('.toAppend').append($('<label></label>').text('Тип предмета'));
+                    $('.toAppend').append(type_select);
+                    $('.toAppend').append($('<br>'));
+
+
+                    {#                    $('.toAppend').append($('<label></label>').text('Тип итоговой аттестации'));#}
+                    {#                    $('.toAppend').append(exam_select);#}
+
+                    $('.toAppend').append($('<br>'));
+                    $('.toAppend').append($('<label></label>').text('Можно накидать доп. баллы '));
+                    $('.toAppend').append($('<input type="checkbox">').attr('name', 'dopballable' + i));
+
+                    $('.toAppend').append($('<div></div>').attr('id', 'toAppend' + i));
+
+
+                    $('#teacher' + i).on('input', function () {
+                        var value = $('#teacher' + i).val();
+                        getTeachers(value);
+                    });
+
+                    $('#type' + i).change(function () {
+                        $('#toAppend' + i).empty();
+                        var sel = $('#type' + i).val();
+                        if (sel < 3) {
+                            $('#toAppend' + i).append($('<label></label>').text('Количество занятий'));
+                            $('#toAppend' + i).append($('<input type="number">').attr('name', 'lessons' + i));
+                        }
+                        if (sel == 3) {
+                            $('#toAppend' + i).append($('<label></label>').text('Количество лекций'));
+                            $('#toAppend' + i).append($('<input type="number">').attr('name', 'lectures' + i));
+                            $('#toAppend' + i).append($('<br>'));
+                            $('#toAppend' + i).append($('<label></label>').text('Количество практик'));
+                            $('#toAppend' + i).append($('<input type="number">').attr('name', 'practices' + i));
+                        }
+                    });
+
+                    {#                    $('#type' + i).focus(function () {#}
+                    {#                        $('#toAppend' + i).empty();#}
+                    {#                    });#}
+
+
+                });
+            }
+        </script>
+
+
+        <button type="submit" value="">Add</button>
+    </form>
+{% endblock %}

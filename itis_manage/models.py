@@ -19,11 +19,12 @@ class Person(models.Model):
     third_name = models.CharField(max_length=40)
     birth_date = models.CharField(max_length=40, null=True, blank=True)
     status = models.ManyToManyField(Status, related_name='status_persons')
-    country = models.CharField('Город', max_length=50, )
+    city = models.ForeignKey('City', related_name='persons_city')
     created_at = models.DateTimeField(default=datetime.datetime.now, auto_created=True)
 
     def __str__(self):
-        return '%s %s %s (%s)' % (self.surname, self.name, self.third_name, [status.name for status in self.status.all()])
+        return '%s %s %s (%s)' % (
+            self.surname, self.name, self.third_name, [status.name for status in self.status.all()])
 
 
 class Semester(models.Model):
@@ -173,3 +174,21 @@ class Magistrate(models.Model):
 
     def __str__(self):
         return self._from
+
+
+class City(models.Model):
+    class Meta:
+        unique_together = (('name', 'country'),)
+
+    name = models.CharField('Город', max_length=50, )
+    country = models.ForeignKey('Country', related_name='country_cities', default=1, auto_created=True, null=False)
+
+    def __str__(self):
+        return self.name + ' (' + self.country.name + ')'
+
+
+class Country(models.Model):
+    name = models.CharField('Страна', max_length=50, default='Россия', unique=True)
+
+    def __str__(self):
+        return self.name
