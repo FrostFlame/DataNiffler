@@ -10,6 +10,24 @@ class Status(models.Model):
         return self.name
 
 
+class Country(models.Model):
+    name = models.CharField('Страна', max_length=50, default='Россия', unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    class Meta:
+        unique_together = (('name', 'country'),)
+
+    name = models.CharField('Город', max_length=50, )
+    country = models.ForeignKey(Country, related_name='country_cities', default=1, auto_created=True, null=False)
+
+    def __str__(self):
+        return self.name + ' (' + self.country.name + ')'
+
+
 class Person(models.Model):
     BIRTH_YEAR_CHOICES = [year for year in range(1960, 2018)]
 
@@ -19,7 +37,7 @@ class Person(models.Model):
     third_name = models.CharField(max_length=40)
     birth_date = models.CharField(max_length=40, null=True, blank=True)
     status = models.ManyToManyField(Status, related_name='status_persons')
-    city = models.ForeignKey('City', related_name='persons_city')
+    city = models.ForeignKey(City, related_name='persons_city')
     created_at = models.DateTimeField(default=datetime.datetime.now, auto_created=True)
 
     def __str__(self):
@@ -174,21 +192,3 @@ class Magistrate(models.Model):
 
     def __str__(self):
         return self._from
-
-
-class City(models.Model):
-    class Meta:
-        unique_together = (('name', 'country'),)
-
-    name = models.CharField('Город', max_length=50, )
-    country = models.ForeignKey('Country', related_name='country_cities', default=1, auto_created=True, null=False)
-
-    def __str__(self):
-        return self.name + ' (' + self.country.name + ')'
-
-
-class Country(models.Model):
-    name = models.CharField('Страна', max_length=50, default='Россия', unique=True)
-
-    def __str__(self):
-        return self.name
