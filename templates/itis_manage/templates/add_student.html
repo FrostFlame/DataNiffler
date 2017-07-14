@@ -7,16 +7,8 @@
 {% block script %}
 {% endblock %}
 
-{% block jquery %}
-
-{% endblock %}
-
-
-
-
-
-
 {% block content %}
+      {{ person_form.media }}
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -24,7 +16,7 @@
             {% endfor %}
         </ul>
     {% endif %}
-    <form method="post" class="form">
+    <form method="post" class="form form-horizontal">
         {% csrf_token %}
         {% for field in person_form.visible_fields %}
             <div class="form-group">
@@ -48,4 +40,5 @@
             <button type="submit" value="">Send</button>
         {% endif %}
     </form>
+
 {% endblock %}

@@ -1,10 +1,8 @@
 from django.conf.urls import url
 from itis_manage import views
 from itis_manage.views import add_subject, AddGroupView, EditGroupView
-from itis_manage.views_ajax import CuratorAutocompleteView
-
+from itis_manage.ajax import *
 from itis_manage.views import add_subject
-from itis_manage.ajax import GetCities
 
 urlpatterns = [
     url(r'^index/$', views.index, name='index'),
@@ -16,7 +14,7 @@ urlpatterns = [
 
     # Group
     url(r'^group/add$', AddGroupView.as_view(), name='create-group'),
-    url(r'^group(?P<pk>(\d+))$', EditGroupView.as_view(), name='edit-group'),
+    url(r'^group/(?P<pk>(\d+))$', EditGroupView.as_view(), name='edit-group'),
     url(r'^subject/add$', add_subject, name='create-subject'),
 
     # Lab
@@ -27,6 +25,8 @@ urlpatterns = [
     url(r'^request/labs$', views.lab_requests, name='lab-requests'),
 
     # Ajax requests
-    url(r'^ajax/cities$', GetCities.as_view(), 'get-cities'),
-    url(r'^ajax/curators', CuratorAutocompleteView.as_view(), name='ajax-curators')
+    url(r'^ajax/cities$', GetCities.as_view(**{'model': City}), name='ajax-cities'),
+    url(r'^ajax/curators$', CuratorAutocompleteView.as_view(**{'status': 'Куратор'}), name='ajax-curators'),
+    url(r'^ajax/statuses$', GetStatuses.as_view(**{'model': Status}), name='ajax-statuses'),
+
 ]

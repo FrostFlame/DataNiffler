@@ -1,5 +1,8 @@
 import os
 import sys
+
+from datetimewidget.widgets import DateTimeWidget, DateWidget
+
 from practice2017.set_lib import get_parser_value, get_database
 from configurations import Configuration
 
@@ -16,8 +19,7 @@ DIR_NAME = os.path.dirname(__file__)
 INSTALLED_APPS = (
     'crispy_forms',
     'widget_tweaks',
-    'dal',
-    'dal_select2',
+
 )
 
 
@@ -55,6 +57,9 @@ class Base(Configuration):
         # Web apps
         'itis_manage',
         'itis_data_niffler',
+        'datetimewidget',
+        'dal',
+        'dal_select2',
     )
     INSTALLED_APPS = INSTALLED_APPS1
 
@@ -98,12 +103,39 @@ class Base(Configuration):
     ]
     DIRNAME = DIR_NAME
 
+    dateTimeOptions = {
+        'format': 'dd-mm-yyyy HH:ii P',
+        'autoclose': True,
+        'showMeridian': True
+    }
+    dateOptions = {
+        'format': 'dd-mm-yyyy',
+        'autoclose': True,
+        'showMeridian': True
+    }
+    widgets = {
+        # NOT Use localization and set a default format
+        'datetime': DateTimeWidget(options=dateTimeOptions),
+        'date': DateWidget(options=dateOptions)
+    }
+
 
 class Master(Base):
     config_parser.read(os.path.join(PRACTICE_2017_SYSTEM_PATH, 'practice.master.cfg'))
     DEBUG = False
     DATABASES = get_database(config_parser, DEBUG)
     ALLOWED_HOSTS = "host.for.deployingdotcom"
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/django_cache',
+            'TIMEOUT': 60,
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000
+            }
+        }
+    }
 
 
 class Dev(Base):

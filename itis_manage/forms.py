@@ -10,11 +10,17 @@ from django.forms import widgets, inlineformset_factory, ModelChoiceField, Model
 from django.shortcuts import get_object_or_404
 import datetime
 
+from django.urls import reverse, reverse_lazy
+
 from itis_data_niffler.lib import set_readable_related_fields
 from itis_manage.models import Student, NGroup, Person, Status, Magistrate, Laboratory, LaboratoryRequests
-
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Field
+from datetimewidget.widgets import DateTimeInput, DateWidget, DateTimeWidget
+
+# Select2 widget settings
+forms.ModelMultipleChoiceField.widget = autocomplete.ModelSelect2Multiple
+forms.ModelChoiceField.widget = autocomplete.ModelSelect2
 
 
 class SimpleForm(forms.Form):
@@ -73,7 +79,7 @@ class GroupForm(forms.ModelForm):
         model = NGroup
         fields = '__all__'
         widgets = {
-            'curator': autocomplete.ModelSelect2Multiple(url='manage:ajax-curators')
+            'curator': autocomplete.ModelSelect2Multiple(url='manage:ajax-curators', )
         }
 
 
@@ -82,15 +88,20 @@ class PersonForm(ReadOnlySupportMixin, forms.ModelForm):
         model = Person
         fields = '__all__'
         exclude = ('created_at',)
+        widgets = {
+            'city': autocomplete.ModelSelect2(url='manage:ajax-cities'),
+        }
 
-    birth_date = forms.DateField(widget=forms.SelectDateWidget(years=Person.BIRTH_YEAR_CHOICES),
-                                 initial=datetime.date.today, label_suffix='(не обязательно)')
+    birth_date = forms.DateField(initial='01.01.2001',
+                                 widget=DateWidget(attrs={'id': "id_birth_date", }, usel10n=True, bootstrap_version=3))
 
 
 class StudentForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = Student
         exclude = ('person',)
+        widgets = {'standing': autocomplete.ModelSelect2(),
+                   'form_of_education': autocomplete.ListSelect2(), }
 
     def save(self, *args, **kwargs):
         if self.is_valid():
