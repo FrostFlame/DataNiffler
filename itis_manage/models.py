@@ -74,10 +74,10 @@ class Person(models.Model):
 
 
 class Semester(models.Model):
-    semester = models.CharField(max_length=2)
+    number = models.IntegerField(editable=True, unique=True)
 
     def __str__(self):
-        return str(self.semester)
+        return self.number
 
 
 class NGroup(models.Model):
@@ -133,7 +133,7 @@ class Subject(models.Model):
 
 
 class Course(models.Model):
-    subject = models.OneToOneField(Subject)
+    subject = models.OneToOneField(Subject, related_name='course_subject')
 
     def __str__(self):
         return self.subject.name
@@ -205,6 +205,9 @@ class SemesterSubject(models.Model):
 
     class Meta:
         unique_together = (('semester', 'subject'),)
+
+    def __str__(self):
+        return self.subject.name + ' #sem = ' + str(self.semester.__str__())
 
 
 class Progress(models.Model):

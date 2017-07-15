@@ -38,3 +38,15 @@ def lab_post(request, ctx, form=LabRequestForm, **kwargs):
         else:
             messages.add_message(request, messages.ERROR, ctx['lab_form'].errors['__all__'])
     return lab_request_object, ctx
+
+
+def get_list_aj(val):
+    return [int(i) for i in val.split(',')]
+
+
+def get_set_sem(val):
+    c = []
+    for i in val:
+        c.append((i-1)*2+1)
+        c.append((i-1)*2+2)
+    return c
