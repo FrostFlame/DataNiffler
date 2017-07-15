@@ -76,13 +76,6 @@ class Person(models.Model):
             self.full_name(), reduce(lambda a, x: str(a) + ', ' + str(x), self.status.all()))
 
 
-class Semester(models.Model):
-    number = models.IntegerField(editable=True, unique=True)
-
-    def __str__(self):
-        return self.number
-
-
 class NGroup(models.Model):
     name = models.CharField(max_length=10)
     year_of_foundation = models.IntegerField()

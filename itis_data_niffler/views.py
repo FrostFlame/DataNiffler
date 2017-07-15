@@ -18,11 +18,11 @@ from itis_manage.models import SemesterSubject, Progress, Subject
 
 import django.forms as f
 
-MARK_TRESHOLDS = (0,0,0,
-    56,
-    71,
-    86
-)
+MARK_TRESHOLDS = (0, 0, 0,
+                  56,
+                  71,
+                  86
+                  )
 
 
 def view_person(request, person_id=None):
@@ -141,6 +141,14 @@ def students_stats_score(request):
     init = {'base_fields': STUDENT_STATS_SCORE_FIELDS,
             'field_order': ('date_begin', 'date_end', 'course', 'semester', 'subject')}
     ctx = {'form': make_form(form_name='form', form_init=init)}
+    if request.method == 'POST':
+        form = ctx['form'](data=request.POST)
+
+        semester = int(form.cleaned_data['course']) * 2 + int(form.cleaned_data['semester'])
+        year_start, year_end = form.cleaned_data['year_start'], form.cleaned_data['year_end']
+
+        students = Student.objects.filter(
+            group__year_of_foundation__range=[year_start - semester // 2, year_end - semester // 2])
     return render(request, 'itis_data_niffler/templates/students_stats_score.html', ctx)
 
 
@@ -155,14 +163,15 @@ class StudentStatsCriteriaView(FormView):
         semester = int(form.cleaned_data['course']) * 2 + int(form.cleaned_data['course_semester'])
         year_start, year_end = form.cleaned_data['year_start'], form.cleaned_data['year_end']
 
-        qs = qs.filter(group__year_of_foundation__range=[year_start - semester//2, year_end - semester//2])
+        qs = qs.filter(group__year_of_foundation__range=[year_start - semester // 2, year_end - semester // 2])
 
         students = qs
         for stud in students:
             stud.events = stud.events.filter(date__year__range=[year_start, year_end])
             stud.dopkas = stud.dopkas.filter(subject__semester__semester=semester)
             stud.commissions = stud.commissions.filter(subject__semester__semester=semester)
-            stud.attendance = stud.attendance.filter(_class__teacher_group__subject__subject__semester__semester=semester)
+            stud.attendance = stud.attendance.filter(
+                _class__teacher_group__subject__subject__semester__semester=semester)
             stud.progresses = stud.progresses.filter(semester_subject__semester__semester=semester)
 
             stud.balls = reduce(lambda ev1, ev2: ev1.balls + ev2.balls, stud.events, 0)
