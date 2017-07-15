@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^subject-rating/$', views.subject_rating, name='subject-rating'),
     url(r'^students/stats/score/$', views.students_stats_score, name='student-rating'),
     url(r'^students/stats/criteria$', views.StudentStatsCriteriaView.as_view(), name='student-criteria'),
+    url(r'^group/stats/score/$', views.group_rating, name='group-rating'),
 
     # Lab
     url(r'^lab/(?P<lab_id>(\d+))$', views.lab_view, name='add-edit-delete-lab'),
@@ -28,5 +29,5 @@ urlpatterns = [
     url(r'^ajax/students/stats/score$', get_filtered_students, name='get-filtered-students'),
 
     # Index
-    url(r'', views.index, name='index'),
+    #url(r'', views.index, name='index'),
 ]

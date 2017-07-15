@@ -1,10 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Data Niffler - Students Stats Score
+{% endblock %}
+
+{% block script %}
+    <script>
+        $("#id_course").change(function () {
+            var course_id = String($(this).val());
+            $.ajax({
+                url: '{% url "manage:get-subjects" %}',
+                traditional: true,
+                data: {
+                    'course_id': course_id
+                },
+                success: function (response) {
+                    var new_options = response;
+                    $('#id_subject').empty();
+                    $.each(new_options, function (index) {
+                        $('#id_subject')
+                            .append($('<option>', {value: new_options[index].subject__id})
+                                .text(new_options[index].subject__name));
+                    });
+                }
+            });
+        });
+        $("#id_course").change(function () {
+            var course_id = String($(this).val());
+            $.ajax({
+                url: '{% url "manage:get-subjects" %}',
+                traditional: true,
+                data: {
+                    'course_id': course_id
+                },
+                success: function (response) {
+                    var new_options = response;
+                    $('#id_subject').empty();
+                    $.each(new_options, function (index) {
+                        $('#id_subject')
+                            .append($('<option>', {value: new_options[index].subject__id})
+                                .text(new_options[index].subject__name));
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}
+{% block content %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet'
+          type='text/css'>
+    <link href="{% static 'css/table_s.css' %}" rel='stylesheet'
+          type='text/css'>
+
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field|add_class:'form-control' }}
+                {% for error in field.errors %}
+                    <span class="help-block">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        {% if not read %}
+            <button type="button" class="button alert-danger" value="">Показать</button>
+        {% endif %}
+
+
+    </form>
+{% endblock %}

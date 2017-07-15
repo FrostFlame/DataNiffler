@@ -212,3 +212,12 @@ class StudentStatsCriteriaView(FormView):
         # TODO columns
 
         return self.render_to_response(self.get_context_data(**ctx))
+
+def group_rating(request):
+    if request.method=='GET':
+        init = {'base_fields': STUDENT_STATS_SCORE_FIELDS,
+                'field_order': ('date_begin', 'date_end', 'course', 'semester', 'subject')}
+        ctx = {'form': make_form(form_name='form', form_init=init)}
+        return render(request, 'itis_data_niffler/templates/group_rating.html', ctx)
+    else:
+        return HttpResponse('hi')
