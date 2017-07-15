@@ -63,7 +63,7 @@ class Person(models.Model):
     third_name = models.CharField(max_length=40)
     birth_date = models.CharField(max_length=40, null=True, blank=True)
     status = models.ManyToManyField(Status, related_name='status_persons')
-    city = models.ForeignKey(City, related_name='persons_city',null=True)
+    city = models.ForeignKey(City, related_name='persons_city', null=True)
     created_at = models.DateTimeField(default=datetime.datetime.now, auto_created=True)
 
     events = models.ManyToManyField(Event, related_name='person_event')
@@ -198,7 +198,7 @@ class SemesterSubject(models.Model):
     )
 
     subject = models.ForeignKey(Subject, related_name='subject_semesters')
-    semester = models.ForeignKey(Semester, related_name='semester_subjects')
+    semester = models.IntegerField(choices=((i, str(i)) for i in range(1, 9)))
     type_of_exam = models.CharField(
         max_length=2,
         choices=TYPE_OF_EXAM_CHOICES,
