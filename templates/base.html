@@ -36,11 +36,6 @@
         });
     </script>
 
-    <script type="application/javascript">
-        {% block script %}
-
-        {% endblock %}
-    </script>
 
     <script type="application/javascript">
         $(function () {
@@ -60,6 +55,11 @@
 
     {% endblock %}
 </div>
+{% block script %}
+    <script type="application/javascript">
+
+    </script>
+{% endblock %}
 {% block footer %}
     {% include 'tellme.html' %}
 {% endblock %}

@@ -31,5 +31,6 @@ urlpatterns = [
     url(r'^ajax/statuses$', GetObjects.as_view(**{'model': Status}), name='ajax-statuses'),
     url(r'^ajax/students$', GetObjects.as_view(**{'model': Student}), name='ajax-students'),
     url(r'^get_teachers/$', views.teachers_ajax, name='teacher-ajax'),
+    url(r'^get_subjects/$', get_subjects, name='get-subjects')
 
 ]
