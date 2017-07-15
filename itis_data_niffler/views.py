@@ -123,3 +123,7 @@ def lab_request_view(request, lab_id):
 
 def lab_requests(request):
     return HttpResponse('Labs')
+
+
+def students_stats_score(request):
+    return None

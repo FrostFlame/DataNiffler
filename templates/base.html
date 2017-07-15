@@ -22,6 +22,7 @@
     <script type="text/javascript" src="/static/autocomplete_light/vendor/select2/dist/js/select2.full.js"></script>
     <script type="text/javascript" src="/static/autocomplete_light/select2.js"></script>
     <link href="/static/css/datetimepicker.css" type="text/css" media="all" rel="stylesheet"/>
+    <link href="{% static 'tellme/feedback.min.css' %}" rel="stylesheet">
     {% block extrahead %}
 
     {% endblock %}
@@ -49,13 +50,16 @@
 
 </head>
 <body>
+<button type="button" id="feedback-btn" class="btn btn-info vertical-right-aligned">
+    Feedback <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span>
+</button>
 <div class="container">
     {% block content %}
 
     {% endblock %}
 </div>
 {% block footer %}
-
+    {%  include 'tellme/js_inc.html' %}
 {% endblock %}
 </body>
 </html>

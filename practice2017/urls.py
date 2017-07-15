@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^manage/', include(manage_urls, namespace='manage')),
     url(r'^update/(?P<table_id>(\d+|info))$', set_lib.update, name='update_tables'),
+    url(r'^tellme/', include("tellme.urls")),
     url(r'^', include(data_niffler_urls, namespace='data')),
 ]

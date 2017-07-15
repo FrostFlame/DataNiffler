@@ -1,8 +1,6 @@
 import os
 import sys
 
-from datetimewidget.widgets import DateTimeWidget, DateWidget
-
 from practice2017.set_lib import get_parser_value, get_database
 from configurations import Configuration
 
@@ -19,7 +17,8 @@ DIR_NAME = os.path.dirname(__file__)
 INSTALLED_APPS = (
     'crispy_forms',
     'widget_tweaks',
-
+    'tellme',
+    'datetimewidget',
 )
 
 
@@ -57,7 +56,6 @@ class Base(Configuration):
         # Web apps
         'itis_manage',
         'itis_data_niffler',
-        'datetimewidget',
         'dal',
         'dal_select2',
     )
@@ -102,7 +100,7 @@ class Base(Configuration):
         os.path.join(BASE_DIR, 'static'),
     ]
     DIRNAME = DIR_NAME
-
+    from datetimewidget.widgets import DateTimeWidget, DateWidget
     dateTimeOptions = {
         'format': 'dd-mm-yyyy HH:ii P',
         'autoclose': True,
@@ -118,6 +116,7 @@ class Base(Configuration):
         'datetime': DateTimeWidget(options=dateTimeOptions),
         'date': DateWidget(options=dateOptions)
     }
+    TELLME_FEEDBACK_EMAIL = ('timurmardanov97@gmail.com',)
 
 
 class Master(Base):
@@ -136,6 +135,7 @@ class Master(Base):
             }
         }
     }
+    TELLME_FEEDBACK_EMAIL = ('',)
 
 
 class Dev(Base):
