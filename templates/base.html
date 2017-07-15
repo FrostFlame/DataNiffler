@@ -23,6 +23,8 @@
     <script type="text/javascript" src="/static/autocomplete_light/select2.js"></script>
     <link href="/static/css/datetimepicker.css" type="text/css" media="all" rel="stylesheet"/>
     <link href="{% static 'tellme/feedback.min.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript" src="/static/js/locales/bootstrap-datetimepicker.ru.js"></script>
     {% block extrahead %}
 
     {% endblock %}
@@ -59,7 +61,7 @@
     {% endblock %}
 </div>
 {% block footer %}
-    {%  include 'tellme/js_inc.html' %}
+    {% include 'tellme/js_inc.html' %}
 {% endblock %}
 </body>
 </html>

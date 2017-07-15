@@ -18,7 +18,6 @@ INSTALLED_APPS = (
     'crispy_forms',
     'widget_tweaks',
     'tellme',
-    'datetimewidget',
 )
 
 
@@ -58,6 +57,8 @@ class Base(Configuration):
         'itis_data_niffler',
         'dal',
         'dal_select2',
+        # datetime here
+        'datetimewidget',
     )
     INSTALLED_APPS = INSTALLED_APPS1
 

@@ -9,8 +9,10 @@ from itis_manage.models import Person, Student, Magistrate, Laboratory, Laborato
 from django.db.models import Max
 from django.shortcuts import render
 from datetime import datetime, date, time
-from itis_data_niffler.lib import semesters, diff_month
+from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS
 from itis_manage.models import SemesterSubject, Progress, Subject
+
+import django.forms as f
 
 
 def view_person(request, person_id=None):
@@ -126,4 +128,7 @@ def lab_requests(request):
 
 
 def students_stats_score(request):
-    return None
+    init = {'base_fields': STUDENT_STATS_SCORE_FIELDS,
+            'field_order': ('date_begin', 'date_end', 'course', 'semester', 'subject')}
+    ctx = {'form': make_form(form_name='form', form_init=init)}
+    return render(request, 'itis_data_niffler/templates/students_stats_score.html', ctx)

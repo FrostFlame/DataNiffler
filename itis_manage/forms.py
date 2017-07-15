@@ -131,7 +131,6 @@ class LaboratoryForm(ReadOnlySupportMixin, forms.ModelForm):
         model = Laboratory
         fields = '__all__'
 
-
 class LabRequestForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = LaboratoryRequests

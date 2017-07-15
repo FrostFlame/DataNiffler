@@ -4,11 +4,27 @@ from dal import autocomplete
 from django.core.exceptions import ValidationError
 from django.forms import ModelChoiceField, ModelMultipleChoiceField, ChoiceField, TypedChoiceField
 
+from itis_manage.models import Subject
+
+COURSE_CHOICES = (
+    (1, '1'),
+    (2, '2'),
+    (3, '3'),
+    (4, '4'),
+)
+
+SEMESTER_CHOICES = (
+    (1, '1'),
+    (2, '2'),
+    (3, 'Оба')
+)
+
 STUDENT_STATS_SCORE_FIELDS = {
     'date_begin': f.DateField(),
     'date_end': f.DateField(),
-    'course': f.MultipleChoiceField(choices=range(1, 5), widget=autocomplete.Select2Multiple()),
-    'semester': f.ChoiceField(choices=range(1, 3), widget=autocomplete.Select2()),
+    'course': f.MultipleChoiceField(choices=COURSE_CHOICES, widget=autocomplete.Select2Multiple()),
+    'semester': f.ChoiceField(choices=SEMESTER_CHOICES, widget=autocomplete.Select2()),
+    'subject': f.ModelMultipleChoiceField(queryset=Subject.objects.all(), widget=autocomplete.ModelSelect2Multiple()),
 }
 
 
@@ -46,5 +62,5 @@ def set_readable_related_fields(instance, self, ):
             raise ValidationError(str(self.fields[field].__class__) + ' is not a readable')
 
 
-def make_form(user, form_name, form_init, form_class=(f.BaseForm,), ctx=None):
-    return type(form_name, form_class, **form_init)
+def make_form(form_name, form_init, form_class=(f.BaseForm,), ctx=None):
+    return type(form_name, form_class, form_init)
