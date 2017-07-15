@@ -66,7 +66,8 @@ class Base(Configuration):
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'DIRS': [os.path.join(BASE_DIR, 'templates'),
-                     os.path.join(BASE_DIR, os.path.join('templates', 'itis_manage'))]
+                     os.path.join(BASE_DIR, os.path.join('templates', 'itis_manage')),
+                     os.path.join(BASE_DIR, os.path.join('templates', 'itis_data_niffler'))]
             ,
             'APP_DIRS': True,
             'OPTIONS': {

@@ -68,9 +68,12 @@ class Person(models.Model):
 
     events = models.ManyToManyField(Event, related_name='person_event')
 
+    def full_name(self):
+        return '%s %s %s' % (self.surname, self.name, self.third_name)
+
     def __str__(self):
-        return '%s %s %s (%s)' % (
-            self.surname, self.name, self.third_name, reduce(lambda a, x: str(a) + ', ' + str(x), self.status.all()))
+        return '%s (%s)' % (
+            self.full_name(), reduce(lambda a, x: str(a) + ', ' + str(x), self.status.all()))
 
 
 class Semester(models.Model):
@@ -209,7 +212,7 @@ class SemesterSubject(models.Model):
 
 class Progress(models.Model):
     semester_subject = models.ForeignKey(SemesterSubject, related_name='semester_subject_progresses')
-    student = models.ForeignKey(Student, related_name='student_progresses')
+    student = models.ForeignKey(Student, related_name='progresses')
     practice = models.IntegerField()
     exam = models.IntegerField()
 

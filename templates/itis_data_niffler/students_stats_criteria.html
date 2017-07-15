@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extrahead %}
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.min.js' %}"></script>
+{% endblock %}
+
+{% block jquery %}
+    $('#list').tablesorter();
+{% endblock %}
+
+{% block content %}
+    <form class="form-horizontal" method="post">
+        {% include 'form_contents.html' %}
+    </form>
+
+    <div>
+        <table class="table table-hover tablesorter" id="list">
+            <thead>
+                <th>Name</th>
+                <th>Мероприятия</th>
+                <th>Допбаллы</th>
+                <th>Допки</th>
+                <th>Комиссии</th>
+                <th>Прогулы</th>
+                <th>Пятерки</th>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>
+                            {{ student.full_name }}
+                        </td>
+                        <td>
+                            {{ student.events|length }}
+                        </td>
+                        <td>
+                            {{ student.balls }}
+                        </td>
+                        <td>
+                            {{ student.dopkas|length }}
+                        </td>
+                        <td>
+                            {{ student.commissions|length }}
+                        </td>
+                        <td>
+                            {{ student.absences|length }}
+                        </td>
+                        <td>
+                            {{ student.five_count }}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
