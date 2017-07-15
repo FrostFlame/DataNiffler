@@ -29,6 +29,31 @@ class City(models.Model):
         return self.name + ' (' + self.country.name + ')'
 
 
+class Event(models.Model):
+    SOCIAL = 'SO'
+    SPORT = 'SP'
+    ENTERTAINMENT = 'ET'
+    POLITICAL = 'PO'
+    OTHER = 'NA'
+
+    EVENT_TYPES = (
+        (SOCIAL, 'Социальное'),
+        (SPORT, 'Спортивное'),
+        (ENTERTAINMENT, 'Развлекательное'),
+        (POLITICAL, 'Политическое'),
+        (OTHER, 'Другое')
+    )
+
+    name = models.CharField('Название', max_length=50)
+    _type = models.CharField('Тип', choices=EVENT_TYPES, default=OTHER, max_length=2)
+    description = models.TextField('Описание')
+    points = models.SmallIntegerField('Доп. баллы')
+
+    date = models.DateField('Дата события')
+    time = models.TimeField('Время события', null=True)
+    place = models.CharField('Место проведеня', null=True, max_length=50)
+
+
 class Person(models.Model):
     BIRTH_YEAR_CHOICES = [year for year in range(1960, 2018)]
 
@@ -38,8 +63,10 @@ class Person(models.Model):
     third_name = models.CharField(max_length=40)
     birth_date = models.CharField(max_length=40, null=True, blank=True)
     status = models.ManyToManyField(Status, related_name='status_persons')
-    city = models.ForeignKey(City, related_name='persons_city')
+    city = models.ForeignKey(City, related_name='persons_city',null=True)
     created_at = models.DateTimeField(default=datetime.datetime.now, auto_created=True)
+
+    events = models.ManyToManyField(Event, related_name='person_event')
 
     def __str__(self):
         return '%s %s %s (%s)' % (
@@ -201,9 +228,15 @@ class TeacherSubject(models.Model):
                             choices=TYPE_CHOICES,
                             default=LECTURE)
 
-    subject = models.ForeignKey(Subject)
+    subject = models.ForeignKey(SemesterSubject, related_name='teachers')
     person = models.ForeignKey(Person)
-    group = models.ManyToManyField(NGroup)
+    group = models.ManyToManyField(NGroup, related_name='subject_groups')
+    lesson_count = models.SmallIntegerField('Количество часов')
+
+
+class TeacherGroup(models.Model):
+    subject = models.ForeignKey(TeacherSubject, related_name='groups')
+    group = models.ForeignKey(NGroup, related_name='teachers')
 
 
 class Magistrate(models.Model):
@@ -212,3 +245,44 @@ class Magistrate(models.Model):
 
     def __str__(self):
         return self._from
+
+
+class AdditionalSession(models.Model):
+    student = models.ForeignKey(Student, related_name='dopkas')
+    subject = models.ForeignKey(SemesterSubject, related_name='dopkas')
+    datetime = models.DateTimeField('Дата пересдачи')
+
+
+class Commission(models.Model):
+    student = models.ForeignKey(Student, related_name='commissions')
+    subject = models.ForeignKey(SemesterSubject, related_name='commissions')
+    datetime = models.DateTimeField('Дата пересдачи')
+
+
+class Lesson(models.Model):
+    num = models.SmallIntegerField('Номер пары')
+    begin = models.TimeField('Время начала')
+    end = models.TimeField('Время конца')
+
+
+class TimetableClass(models.Model):
+    EACH = 0
+    ODD = 1
+    EVEN = 2
+
+    PERIOD_TYPES = (
+        (EACH, 'Каждую неделю'),
+        (EVEN, 'По четным неделям'),
+        (ODD, 'По нечетным неделям')
+    )
+
+    classroom = models.CharField('Номер аудитории', max_length=10)
+    day_of_week = models.SmallIntegerField('День недели')
+    teacher_group = models.ForeignKey(TeacherGroup, related_name='classes')
+    period = models.SmallIntegerField(choices=PERIOD_TYPES, default=EACH)
+
+
+class AbsenceEntry(models.Model):
+    _class = models.ForeignKey(TimetableClass, related_name='attendance')
+    student = models.ForeignKey(Student, related_name='attendance')
+    date = models.DateField('Дата занятия')

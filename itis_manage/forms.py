@@ -87,7 +87,7 @@ class PersonForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = Person
         fields = '__all__'
-        exclude = ('created_at',)
+        exclude = ('created_at', 'events')
         widgets = {
             'city': autocomplete.ModelSelect2(url='manage:ajax-cities'),
         }
