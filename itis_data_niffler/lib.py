@@ -46,6 +46,12 @@ def diff_month(d1, d2):
     return (int(d1.year) - d2) * 12 + int(d1.month) - MONTH_OF_GROUPS_FOUNDATION
 
 
+def get_sem(today_date, year_of_foundation):
+    course = int(diff_month(today_date, year_of_foundation)) // 12 + 1
+    semester = course * 2 - 1 if int(diff_month(today_date, year_of_foundation)) % 12 <= 4 else course * 2
+    return semester
+
+
 def set_readable_related_fields(instance, self, ):
     for field in self.fields:
         try:
