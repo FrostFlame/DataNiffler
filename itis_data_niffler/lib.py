@@ -1,4 +1,5 @@
-from datetime import datetime
+import datetime
+
 import django.forms as f
 from dal import autocomplete
 from django.core.exceptions import ValidationError
@@ -21,10 +22,10 @@ SEMESTER_CHOICES = (
 )
 
 STUDENT_STATS_SCORE_FIELDS = {
-    'date_begin': f.DateField(widget=settings.Base.widgets['date']),
-    'date_end': f.DateField(widget=settings.Base.widgets['date']),
+    'date_begin': f.IntegerField(initial=datetime.datetime.today().year-1),
+    'date_end': f.IntegerField(initial=datetime.date.today().year),
     'course': f.MultipleChoiceField(choices=COURSE_CHOICES, widget=autocomplete.Select2Multiple()),
-    'semester': f.ChoiceField(choices=SEMESTER_CHOICES, widget=autocomplete.Select2()),
+    'semester': f.ChoiceField(choices=SEMESTER_CHOICES, initial=3, widget=autocomplete.Select2()),
     'subject': f.ModelMultipleChoiceField(queryset=Subject.objects.all(), widget=autocomplete.ModelSelect2Multiple()),
 }
 

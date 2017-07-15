@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load widget_tweaks %}
+
 {% block title %}
     Data Niffler - Students Stats Score
 {% endblock %}
@@ -24,10 +26,35 @@
                     });
                 }
             });
-        })
+        });
+        $("#id_course").change(function () {
+            var course_id = String($(this).val());
+            $.ajax({
+                url: '{% url "manage:get-subjects" %}',
+                traditional: true,
+                data: {
+                    'course_id': course_id
+                },
+                success: function (response) {
+                    var new_options = response;
+                    $('#id_subject').empty();
+                    $.each(new_options, function (index) {
+                        $('#id_subject')
+                            .append($('<option>', {value: new_options[index].subject__id})
+                                .text(new_options[index].subject__name));
+                    });
+                }
+            });
+        });
     </script>
 {% endblock %}
 {% block content %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet'
+          type='text/css'>
+    <link href="{% static 'css/table_s.css' %}" rel='stylesheet'
+          type='text/css'>
+
+
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -47,9 +74,70 @@
             </div>
         {% endfor %}
         {% if not read %}
-            <button type="submit" value="">Send</button>
+            <button type="button" class="button alert-danger" value="">Показать</button>
         {% endif %}
+
+
     </form>
 
+    <div class="col-md-10 col-md-offset-1">
+
+        <div class="panel panel-default panel-table">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col col-xs-6">
+                        <h3 class="panel-title">Students</h3>
+                    </div>
+                    {% comment %}<div class="col col-xs-6 text-right">
+                    <button type="button" class="btn btn-sm btn-primary btn-create">Create New</button>
+                  </div>{% endcomment %}
+                </div>
+            </div>
+            <div class="panel-body">
+                <table class="table table-striped table-bordered table-list">
+                    <thead>
+                    <tr>
+                        {% comment %}<th><em class="fa fa-cog"></em></th>
+                        {% endcomment %}
+                        <th class="hidden-xs">ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {% comment %}<td align="center">
+                              <a class="btn btn-default"><em class="fa fa-pencil"></em></a>
+                              <a class="btn btn-danger"><em class="fa fa-trash"></em></a>
+                            </td>
+                            {% endcomment %}
+                        <td class="hidden-xs">1</td>
+                        <td>John Doe</td>
+                        <td>johndoe@example.com</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col col-xs-4">Page 1 of 5
+                    </div>
+                    <div class="col col-xs-8">
+                        <ul class="pagination hidden-xs pull-right">
+                            <li><a href="#">1</a></li>
+                            <li><a href="#">2</a></li>
+                            <li><a href="#">3</a></li>
+                            <li><a href="#">4</a></li>
+                            <li><a href="#">5</a></li>
+                        </ul>
+                        <ul class="pagination visible-xs pull-right">
+                            <li><a href="#">«</a></li>
+                            <li><a href="#">»</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 {% endblock %}
