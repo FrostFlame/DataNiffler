@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelChoiceField, ModelMultipleChoiceField, ChoiceField, TypedChoiceField
 
 from itis_manage.models import Subject
+from practice2017 import settings
 
 COURSE_CHOICES = (
     (1, '1'),
@@ -20,8 +21,8 @@ SEMESTER_CHOICES = (
 )
 
 STUDENT_STATS_SCORE_FIELDS = {
-    'date_begin': f.DateField(),
-    'date_end': f.DateField(),
+    'date_begin': f.DateField(widget=settings.Base.widgets['date']),
+    'date_end': f.DateField(widget=settings.Base.widgets['date']),
     'course': f.MultipleChoiceField(choices=COURSE_CHOICES, widget=autocomplete.Select2Multiple()),
     'semester': f.ChoiceField(choices=SEMESTER_CHOICES, widget=autocomplete.Select2()),
     'subject': f.ModelMultipleChoiceField(queryset=Subject.objects.all(), widget=autocomplete.ModelSelect2Multiple()),

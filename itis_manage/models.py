@@ -101,9 +101,28 @@ class Student(models.Model):
 class Subject(models.Model):
     name = models.CharField(max_length=30, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Course(models.Model):
     subject = models.OneToOneField(Subject)
+
+    def __str__(self):
+        return self.subject.name
+
+
+class CourseRequest(models.Model):
+    class Meta:
+        unique_together = (('course', 'student'),)
+
+    course = models.ForeignKey(Course, related_name='courses_requests_course')
+    student = models.ForeignKey(Student, related_name='students_requests_student')
+    is_active = models.BooleanField(default=False)
+    date = models.DateTimeField(default=datetime.datetime.now, auto_created=True)
+
+    def __str__(self):
+        return self.student.__str__() + 'requested to ' + self.course.__str__()
 
 
 class Laboratory(models.Model):
