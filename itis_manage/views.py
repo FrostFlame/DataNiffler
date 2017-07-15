@@ -4,10 +4,9 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect as Redirect
 from django.http import JsonResponse
-from itis_manage.models import Semester, Laboratory, Subject, SemesterSubject, Course, Status
-from django.views.generic import FormView, CreateView, UpdateView
-
-from itis_manage.models import Semester, Laboratory
+from itis_manage.models import Subject, SemesterSubject, Course, Status
+from django.views.generic import CreateView, UpdateView
+from itis_manage.models import Laboratory
 from itis_manage.forms import GroupForm, LaboratoryForm, LabRequestForm
 from itis_manage.models import NGroup, LaboratoryRequests
 from itis_manage.forms import MagistrForm
@@ -127,7 +126,7 @@ def teachers_ajax(request):
     name = request.GET.get('name', '')
     qs = Person.objects.all()
     for term in name.split():
-        qs = qs.filter(Q(name__icontains=term) | Q(surname__icontains=term) | Q(third_name__icontains=term))\
+        qs = qs.filter(Q(name__icontains=term) | Q(surname__icontains=term) | Q(third_name__icontains=term)) \
             .values('id', 'name', 'surname', 'third_name')
     print(qs)
     return JsonResponse({'res': list(qs)})

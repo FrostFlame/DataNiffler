@@ -20,5 +20,5 @@ def get_subjects(request):
     if course:
         courses = get_list_aj(course)
         semesters = get_set_sem(courses)
-        subjects = SemesterSubject.objects.filter(semester__number__in=semesters).values('subject__id', 'subject__name')
+        subjects = SemesterSubject.objects.filter(semester__in=semesters).values('subject__id', 'subject__name')
         return JsonResponse(list(subjects), safe=False)
