@@ -13,7 +13,8 @@ from itis_manage.models import Person, Student, Magistrate, Laboratory, Laborato
 from django.db.models import Max
 from django.shortcuts import render
 from datetime import datetime, date, time
-from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS
+from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS, SEMESTER_CHOICES, \
+    SEMESTER_BOTH
 from itis_manage.models import SemesterSubject, Progress, Subject
 
 import django.forms as f
@@ -143,12 +144,38 @@ def students_stats_score(request):
     ctx = {'form': make_form(form_name='form', form_init=init)}
     if request.method == 'POST':
         form = ctx['form'](data=request.POST)
+        ctx['form'] = form
+        if form.is_valid():
+            courses = form.cleaned_data['course']  # May list
+            semester = form.cleaned_data['semester']  # May 3 Both
+            subjects = form.cleaned_data['subject']  # May list
+            year_start, year_end = int(form.cleaned_data['date_begin']), int(form.cleaned_data['date_end'])
 
-        semester = int(form.cleaned_data['course']) * 2 + int(form.cleaned_data['semester'])
-        year_start, year_end = form.cleaned_data['year_start'], form.cleaned_data['year_end']
-
-        students = Student.objects.filter(
-            group__year_of_foundation__range=[year_start - semester // 2, year_end - semester // 2])
+            years_list = set()  # Group years
+            for i in courses:
+                for j in list(range(year_start, year_end)):
+                    years_list.add(j - int(i) + 1)
+            kwargs = {
+                'group__year_of_foundation__in': years_list,
+                'progresses__semester_subject__subject__in': subjects,
+            }
+            students = Student.objects.filter(**kwargs).order_by('progresses__semester_subject')
+            # Get semester
+            student_rating = {}
+            for student in students:
+                progresses = Progress.objects.filter(student=student)
+                student_score = 0
+                for p in progresses:
+                    student_score += p.get_final_points()
+                student_rating[student_score] = []
+                student_rating[student_score / progresses.count()].append(student.id)
+                student_rating = sorted(student_rating.items(), key=lambda x: x[0], reverse=True)
+                # For separated tables
+                # subj = SemesterSubject.objects.filter(semester_subject_progresses__in=progresses)
+                ctx['students'] = students
+                ctx['progresses'] = progresses
+                ctx['student_rating'] = student_rating
+                # ctx['subj'] = subj
     return render(request, 'itis_data_niffler/templates/students_stats_score.html', ctx)
 
 

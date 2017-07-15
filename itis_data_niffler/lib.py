@@ -15,14 +15,20 @@ COURSE_CHOICES = (
     (4, '4'),
 )
 
+SEMESTER_BOTH = 3
+
 SEMESTER_CHOICES = (
     (1, '1'),
     (2, '2'),
     (3, 'Оба')
 )
 
+CONTEXT = {
+    ''
+}
+
 STUDENT_STATS_SCORE_FIELDS = {
-    'date_begin': f.IntegerField(initial=datetime.datetime.today().year-1),
+    'date_begin': f.IntegerField(initial=datetime.datetime.today().year - 1),
     'date_end': f.IntegerField(initial=datetime.date.today().year),
     'course': f.MultipleChoiceField(choices=COURSE_CHOICES, widget=autocomplete.Select2Multiple()),
     'semester': f.ChoiceField(choices=SEMESTER_CHOICES, initial=3, widget=autocomplete.Select2()),

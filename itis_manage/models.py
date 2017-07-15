@@ -215,6 +215,9 @@ class Progress(models.Model):
     class Meta:
         unique_together = (('semester_subject', 'student'),)
 
+    def get_final_points(self):
+        return self.practice + self.exam
+
 
 class TeacherSubject(models.Model):
     PRACTICE = 'P'

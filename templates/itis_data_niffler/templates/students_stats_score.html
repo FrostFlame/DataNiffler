@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load widget_tweaks %}
-
+{% load custom_tags %}
 {% block title %}
     Data Niffler - Students Stats Score
 {% endblock %}
@@ -79,14 +79,14 @@
 
 
     </form>
-
-    <div class="col-md-10 col-md-offset-1">
+    {% if progresses %}
+        <div class="col-md-10 col-md-offset-1">
 
         <div class="panel panel-default panel-table">
             <div class="panel-heading">
                 <div class="row">
                     <div class="col col-xs-6">
-                        <h3 class="panel-title">Students</h3>
+                        <h3 class="panel-title">Filtered Students</h3>
                     </div>
                     {% comment %}<div class="col col-xs-6 text-right">
                     <button type="button" class="btn btn-sm btn-primary btn-create">Create New</button>
@@ -100,21 +100,27 @@
                         {% comment %}<th><em class="fa fa-cog"></em></th>
                         {% endcomment %}
                         <th class="hidden-xs">ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
+                        <th>Имя</th>
+                        <th>Группа</th>
+                        <th>Средний бал</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        {% comment %}<td align="center">
+                    {% for score, student in student_rating %}
+                        <tr>
+                            {% comment %}<td align="center">
                               <a class="btn btn-default"><em class="fa fa-pencil"></em></a>
                               <a class="btn btn-danger"><em class="fa fa-trash"></em></a>
                             </td>
                             {% endcomment %}
-                        <td class="hidden-xs">1</td>
-                        <td>John Doe</td>
-                        <td>johndoe@example.com</td>
-                    </tr>
+
+                            <td class="hidden-xs"></td>
+                            <td>{% return_user student 'person' %} </td>
+                            <td>{% return_user student 'group' %}</td>
+                            <td>{{ score }}</td>
+
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
 
@@ -139,5 +145,5 @@
                 </div>
             </div>
         </div>
-
+    {% endif %}
 {% endblock %}
