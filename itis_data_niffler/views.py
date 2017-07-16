@@ -314,7 +314,6 @@ def group_rating(request):
                     else:
                         group_rating[group_score / progresses.count()].append(group)
                 group_score_by_subjects[group.id] = []
-                subjects = Subject.objects.filter(subject_semesters__semester__in=sems)
                 for subject in subjects:
                     group_subject_score = 0
                     subject_progresses = Progress.objects.filter(semester_subject__subject=subject,

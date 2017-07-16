@@ -4,7 +4,7 @@
 {% load custom_tags %}
 
 {% block title %}
-    Data Niffler - Students Stats Score
+    Group Rating
 {% endblock %}
 
 {% block script %}
@@ -60,16 +60,17 @@
     <form method="post">
         {% csrf_token %}
         {% for field in form.visible_fields %}
-            <div class="form-group">
+            <div  class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field|add_class:'form-control' }}
+
                 {% for error in field.errors %}
                     <span class="help-block">{{ error }}</span>
                 {% endfor %}
             </div>
         {% endfor %}
         {% if not read %}
-            <input type="submit" value="Показать"/>
+            <button type="submit" class="button btn-success" >Показать</button>
         {% endif %}
 
 
