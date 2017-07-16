@@ -14,7 +14,10 @@ def return_model_object_field(model, id, field):
 
 @register.simple_tag
 def progress_id_subject_id(dict, subject_id):
-    return dict[subject_id]
+    try:
+        return dict[subject_id]
+    except:
+        return 'None'
 
 @register.filter
 def get_item(dictionary, key):

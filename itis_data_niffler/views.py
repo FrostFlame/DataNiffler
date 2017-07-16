@@ -169,12 +169,13 @@ def students_stats_score(request):
                 for p in progresses:
                     student_score += p.get_final_points()
                     student_rating[student.id].update({p.semester_subject.id: p.get_final_points()})
-                student_rating[student.id].update({'final': student_score})
-                # student_score / progresses.count()
+                student_rating[student.id].update({'final': student_score / progresses.count()})
             print(student_rating.items())
             student_rating = sorted(student_rating.items(), key=lambda x: x[1]['final'], reverse=True)
             ctx['student_rating'] = student_rating
             ctx['student_subjects'] = SemesterSubject.objects.filter(id__in=subjects).order_by('id')
+            form.fields['subject'].queryset = form.cleaned_data['subject']
+            ctx['form'] = form
     return render(request, 'itis_data_niffler/templates/students_stats_score.html', ctx)
 
 
