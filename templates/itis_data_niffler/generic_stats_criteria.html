@@ -27,7 +27,7 @@
                     <tr>
                     {% for _, key in fields.items %}
                         <td>
-                            {{ object|get_attr:key }}
+                            {{ object|getattr2:key }}
                         </td>
                     {% endfor %}
                     </tr>

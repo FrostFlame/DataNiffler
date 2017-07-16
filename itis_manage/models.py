@@ -3,6 +3,8 @@ from functools import reduce
 
 from django.db import models
 
+from practice2017.lib import today
+
 
 class Status(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -74,6 +76,15 @@ class Person(models.Model):
     def __str__(self):
         return '%s (%s)' % (
             self.full_name(), reduce(lambda a, x: str(a) + ', ' + str(x), self.status.all()))
+
+
+class WorkExperience(models.Model):
+    exp_before = models.PositiveSmallIntegerField()
+    hire_year = models.PositiveSmallIntegerField(max_length=4)
+    person = models.OneToOneField(Person, models.CASCADE, related_name='experience')
+
+    def exp_total(self):
+        return self.exp_before + (today().year - self.hire_year)
 
 
 class NGroup(models.Model):
@@ -156,7 +167,7 @@ class Laboratory(models.Model):
         return self.name
 
 
-class LaboratoryRequests(models.Model):  # TODO this is a single request
+class LaboratoryRequest(models.Model):
     fields = ('student',
               'laboratory',
               'is_active',
@@ -231,8 +242,7 @@ class TeacherSubject(models.Model):
                             default=LECTURE)
 
     subject = models.ForeignKey(SemesterSubject, related_name='teachers')
-    person = models.ForeignKey(Person)
-    group = models.ManyToManyField(NGroup, related_name='subject_groups')
+    person = models.ForeignKey(Person, related_name='teacher_subjects')
     lesson_count = models.SmallIntegerField('Количество часов')
 
 

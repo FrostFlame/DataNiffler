@@ -8,7 +8,7 @@ from itis_manage.models import Subject, SemesterSubject, Course, Status
 from django.views.generic import CreateView, UpdateView
 from itis_manage.models import Laboratory
 from itis_manage.forms import GroupForm, LaboratoryForm, LabRequestForm
-from itis_manage.models import NGroup, LaboratoryRequests
+from itis_manage.models import NGroup, LaboratoryRequest
 from itis_manage.forms import MagistrForm
 from django.shortcuts import render, get_object_or_404
 from itis_manage.forms import UserForm, StudentForm, PersonForm, SimpleForm
@@ -142,7 +142,7 @@ def lab_request(request, lab_id=None):
         if lab_request_object is not None:
             return Redirect(reverse('manage:lab-request-add-edit-delete', args=(lab_request_object.id,)))
     else:
-        lab_req = get_object_or_404(LaboratoryRequests, pk=lab_id)
+        lab_req = get_object_or_404(LaboratoryRequest, pk=lab_id)
         params['instance'] = lab_req
         ctx['lab_form'] = LabRequestForm(instance=lab_req)
         lab_request_object, ctx = lab_post(request, ctx, **params)

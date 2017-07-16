@@ -1,29 +1,27 @@
+from datetime import datetime
 from functools import reduce
 
 from django.contrib import messages
+from django.db.models import Max, Q
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, FormView
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render
+from django.views.generic import FormView
 
 from itis_data_niffler.forms import StudentStatsCriteriaForm, TeacherStatsCriteriaForm
+from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS
+from practice2017.lib import age
 from itis_manage.forms import PersonForm, StudentForm, MagistrForm, LaboratoryForm, LabRequestForm
-from itis_manage.lib import get_unique_object_or_none, LAB_REQUEST_FIELDS, lab_post, get_set_sem
-from itis_manage.models import Person, Student, Magistrate, Laboratory, LaboratoryRequests, NGroup
-
-from django.db.models import Max
-from django.shortcuts import render
-from datetime import datetime, date, time
-from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS, SEMESTER_CHOICES, \
-    SEMESTER_BOTH, today, age
+from itis_manage.lib import get_unique_object_or_none, get_set_sem
+from itis_manage.models import Person, Student, Magistrate, Laboratory, LaboratoryRequest, NGroup, TeacherSubject, \
+    AdditionalSession, Commission
 from itis_manage.models import SemesterSubject, Progress, Subject
 
-import django.forms as f
-
-MARK_TRESHOLDS = (0, 0, 0,
-                  56,
-                  71,
-                  86
-                  )
+MARK_THRESHOLDS = (0, 0, 0,
+                   56,
+                   71,
+                   86
+                   )
 
 
 def view_person(request, person_id=None):
@@ -127,7 +125,7 @@ def lab_view(request, lab_id):
 def lab_request_view(request, lab_id):
     ctx = {'read': True, 'lab_form': LabRequestForm()}
     if request.method == 'GET':
-        lab_req = get_object_or_404(LaboratoryRequests, pk=lab_id)
+        lab_req = get_object_or_404(LaboratoryRequest, pk=lab_id)
         ctx['lab_form'] = LabRequestForm(instance=lab_req, readonly=True)
     else:
         messages.add_message(request, messages.INFO, 'POST method not allowed here!')
@@ -207,7 +205,7 @@ class StudentStatsCriteriaView(FormView):
 
             stud.balls = reduce(lambda ev1, ev2: ev1.balls + ev2.balls, stud.events, 0)
             stud.five_count = len(list(filter(
-                lambda progress: progress.practice + progress.exam >= MARK_TRESHOLDS[5], stud.progresses)))
+                lambda progress: progress.practice + progress.exam >= MARK_THRESHOLDS[5], stud.progresses)))
 
         ctx = {
             'form': form,
@@ -227,18 +225,36 @@ class TeacherStatsCriteriaView(FormView):
         qs = Person.objects.filter(teacher_subjects__isnull=False)
         subject = form.cleaned_data.get('subject', None)
         if subject is not None:
-            qs = qs.filter(teacher_subjects__subject=subject)
+            qs = qs.filter(teacher_subjects__subject__subject=subject)
 
         teachers = qs
         teachers.prefetch_related('teacher_subjects')
         for teacher in teachers:
-            # TODO experience (NA in current model)
-            # TODO dopkas (NA in current model)
-            # TODO commisions (NA in current model)
-            # TODO avg ball (NA in current model)
             teacher.num_hours = sum([subject.lesson_count for subject in teacher.teacher_subjects])
             teacher.num_subjects = len(teacher.teacher_subjects)
             teacher.age = age(teacher.birth_date)
+
+            teacher_subjects = teacher.teacher_subjects if not subject \
+                else TeacherSubject.objects.filter(subject__subject=subject)
+            teacher_subjects = teacher_subjects.filter(type=TeacherSubject.LECTURE)
+
+            teacher_subjects.prefetch_related('groups')
+            scores = []
+            teacher.dopkas = 0
+            teacher.commissions = 0
+            for teacher_subject in teacher_subjects:
+                progresses = Progress.objects.filter(Q(semester_subject=teacher_subject.subject)
+                                                     & Q(student__group__in=teacher_subject.groups))
+                dopkas = AdditionalSession.objects.filter(Q(semester_subject=teacher_subject.subject)
+                                                     & Q(student__group__in=teacher_subject.groups))
+                commissions = Commission.objects.filter(Q(semester_subject=teacher_subject.subject)
+                                                     & Q(student__group__in=teacher_subject.groups))
+
+                teacher.dopkas += len(dopkas)
+                teacher.commissions += len(commissions)
+                scores += [progress.practice + progress.exam for progress in progresses]
+
+            teacher.avg_score = sum(scores) / len(scores)
 
         ctx = {
             'form': form,
@@ -247,7 +263,13 @@ class TeacherStatsCriteriaView(FormView):
                 'Имя': 'full_name',
                 'Число предметов': 'num_subjects',
                 'Возраст': 'age',
-                'Число часов': 'num_hours'
+                'Число часов': 'num_hours',
+                'Страна': 'city.country',
+                'Город': 'city',
+                'Стаж': 'experience.exp_total',
+                'Средний балл': 'avg_score',
+                'Доп. сессии': 'dopkas',
+                'Комиссии': 'commissions'
             }
         }
 

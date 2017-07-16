@@ -2,11 +2,11 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 
 from itis_manage.forms import PersonForm, StudentForm, MagistrForm, LabRequestForm
-from itis_manage.models import Student, LaboratoryRequests
+from itis_manage.models import Student, LaboratoryRequest
 
 # FIELDS
 
-LAB_REQUEST_FIELDS = LaboratoryRequests._meta.fields
+LAB_REQUEST_FIELDS = LaboratoryRequest._meta.fields
 
 
 def get_unique_object_or_none(model=User, **kwargs):

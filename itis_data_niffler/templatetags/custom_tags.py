@@ -22,6 +22,27 @@ def get_item(dictionary, key):
     return dictionary.get(key)
 
 
-@register.filter
+@register.filter(name='getattr')
 def get_attr(obj, key):
     return getattr(obj, key, None)
+
+
+@register.filter(name='getattr2')
+def get_attr_nested(obj, key):
+    """
+    Retrieves object attribute, supports dot separated nested paths
+    All the callables are called without parameters (just like in Django templates)
+
+    :param obj: object to get attribute from
+    :param key: attribute or callable, or path
+        (i.e. get_attr_nested(obj, 'foo.bar') will return either
+        obj.foo.bar, or obj.foo.bar(), or obj.foo().bar(), or obj.foo().bar)
+    :return: value of specified attribute or callable
+    """
+    if not key:
+        return obj
+    path = key.split('.')
+    attr = getattr(obj, path[0], {})
+    if callable(attr):
+        attr = attr()
+    return get_attr_nested(attr, '.'.join(path[1:]))

@@ -24,9 +24,9 @@ class StudentStatsCriteriaForm(forms.Form):
 
 
 class TeacherStatsCriteriaForm(forms.Form):
-    AVG_BALL, NUM_DOPKAS, NUM_COMMS, NUM_SUBJECTS, NUM_HOURS, EXP, AGE = range(7)
+    AVG_SCORE, NUM_DOPKAS, NUM_COMMS, NUM_SUBJECTS, NUM_HOURS, EXP, AGE = range(7)
     CRITERIA_CHOICES = (
-        (AVG_BALL, 'Средний балл'),
+        (AVG_SCORE, 'Средний балл'),
         (NUM_DOPKAS, 'Число доп.сессий'),
         (NUM_COMMS, 'Число комиссий'),
         (NUM_SUBJECTS, 'Число предметов'),
