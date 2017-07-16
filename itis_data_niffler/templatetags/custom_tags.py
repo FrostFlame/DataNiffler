@@ -15,3 +15,8 @@ def return_model_object_field(model, id, field):
 @register.simple_tag
 def progress_id_subject_id(dict, subject_id):
     return dict[subject_id]
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+

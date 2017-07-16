@@ -219,6 +219,7 @@ def group_rating(request):
             'field_order': ('date_begin', 'date_end', 'course', 'semester', 'subject')}
     ctx = {'form': make_form(form_name='form', form_init=init)}
     group_rating = {}
+    group_score_by_subjects = {}
     if request.method == 'POST':
         form = ctx['form'](data=request.POST)
         if form.is_valid():
@@ -233,9 +234,11 @@ def group_rating(request):
                 years = list(set(years))
             groups = NGroup.objects.all().filter(
                 year_of_foundation__in=years)
-            sems = [int(course - 1) * 2 + 1 for course in courses] if semester in [1, 2] else get_set_sem(courses)
+            sems = [int(course - 1) * 2 + 1 for course in courses] if semester in [1, 2] else get_set_sem(
+                list(map(int, courses)))
             semester_subject = SemesterSubject.objects.filter(subject__in=subjects, semester__in=sems)
             for group in groups:
+
                 group_score = 0
                 progresses = Progress.objects.all().filter(semester_subject__in=semester_subject,
                                                            student__in=group.group_students.all())
@@ -247,7 +250,20 @@ def group_rating(request):
                         group_rating[group_score / progresses.count()].append(group)
                     else:
                         group_rating[group_score / progresses.count()].append(group)
+                group_score_by_subjects[group.id] = []
+                for subject in Subject.objects.all():
+                    group_subject_score = 0
+                    subject_progresses = Progress.objects.filter(semester_subject__semester__in=sems,
+                                                                 semester_subject__subject=subject,
+                                                                 student__in=group.group_students.all())
+                    for p in subject_progresses:
+                        group_subject_score += p.exam + p.practice
+                    if subject_progresses.count() != 0:
+                        group_subject_score = group_subject_score / subject_progresses.count()
+                        group_score_by_subjects[group.id].append((group_subject_score, subject))
+                    print(group_score_by_subjects)
             group_rating = sorted(group_rating.items(), key=lambda x: x[0], reverse=True)
         return render(request, 'itis_data_niffler/templates/group_rating.html',
-                      {'form': make_form(form_name='form', form_init=init), 'group_rating': group_rating})
+                      {'form': make_form(form_name='form', form_init=init), 'group_rating': group_rating,
+                       'group_score_by_subjects': group_score_by_subjects})
     return render(request, 'itis_data_niffler/templates/group_rating.html', ctx)

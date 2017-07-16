@@ -1,48 +1,43 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load widget_tweaks %}
+{% load custom_tags %}
 
 {% block title %}
     Data Niffler - Students Stats Score
 {% endblock %}
 
 {% block script %}
-    <script>
-        $("#id_course").change(function () {
-            var course_id = String($(this).val());
-            $.ajax({
-                url: '{% url "manage:get-subjects" %}',
-                traditional: true,
-                data: {
-                    'course_id': course_id
-                },
-                success: function (response) {
-                    var new_options = response;
-                    $('#id_subject').empty();
-                    $.each(new_options, function (index) {
-                        $('#id_subject')
-                            .append($('<option>', {value: new_options[index].subject__id})
-                                .text(new_options[index].subject__name));
-                    });
-                }
+   <script>
+        $("#id_course,#id_semester").each(function () {
+            $(this).change(function () {
+                var course_id = String($("#id_course").val());
+                var semester_id = String($("#id_semester").val());
+                $.ajax({
+                    url: '{% url "manage:ajax-get-subjects" %}',
+                    traditional: true,
+                    data: {
+                        'course_id': course_id,
+                        'semester_id': semester_id
+                    },
+                    success: function (response) {
+                        var new_options = response;
+                        $('#id_subject').empty();
+                        $.each(new_options, function (index) {
+                            $('#id_subject')
+                                .append($('<option>', {value: new_options[index].subject__id})
+                                    .text(new_options[index].subject__name));
+                        });
+                    }
+                });
             });
         });
-        $("#id_course").change(function () {
-            var course_id = String($(this).val());
-            $.ajax({
-                url: '{% url "manage:get-subjects" %}',
-                traditional: true,
-                data: {
-                    'course_id': course_id
-                },
-                success: function (response) {
-                    var new_options = response;
-                    $('#id_subject').empty();
-                    $.each(new_options, function (index) {
-                        $('#id_subject')
-                            .append($('<option>', {value: new_options[index].subject__id})
-                                .text(new_options[index].subject__name));
-                    });
+        $("#id_date_begin,#id_date_end").each(function () {
+            $(this).change(function () {
+                var d_id = parseInt($("#id_date_begin").val());
+                var e_id = parseInt($("#id_date_end").val());
+                if (d_id >= e_id) {
+                    $("#id_date_begin").val(e_id - 1);
                 }
             });
         });
@@ -82,16 +77,20 @@
 
     {% if group_rating %}
 
-        <table border="2"  width="600">
-            <tr>
-
-                <th>Группа</th>
-                <th>Балл</th>
-             </tr>
+        <table style="padding-top: 50px;" border="2"  width="600">
+            
             {% for score, groups in group_rating %}
                 {% for group in groups%}
                 <tr>
+
                     <td>{{ group }}</td>
+                    {% if group_score_by_subjects %}
+                        {% for subject_score, subject in group_score_by_subjects|get_item:group.id %}
+                            <th>{{ subject.name }}</th>
+                            <td>{{ subject_score }}</td>
+                        {% endfor %}
+                    {% endif %}
+                <th>Средний балл</th>
                     <td>{{ score }}</td>
                 </tr>
                 {% endfor %}
