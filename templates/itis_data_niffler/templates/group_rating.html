@@ -76,9 +76,15 @@
     </form>
 
     {% if group_rating %}
-
-        <table style="padding-top: 50px;" border="2"  width="600">
-            
+        <div style="padding-top: 50px;">
+        <table  border="2"  width="600" class="table table-bordered" >
+            <tr>
+            <th>Группа</th>
+            {% for subject in subjects %}
+                <th>{{ subject.name}}</th>
+            {% endfor %}
+            <th>Средний балл</th>
+            </tr>
             {% for score, groups in group_rating %}
                 {% for group in groups%}
                 <tr>
@@ -86,16 +92,15 @@
                     <td>{{ group }}</td>
                     {% if group_score_by_subjects %}
                         {% for subject_score, subject in group_score_by_subjects|get_item:group.id %}
-                            <th>{{ subject.name }}</th>
                             <td>{{ subject_score }}</td>
                         {% endfor %}
                     {% endif %}
-                <th>Средний балл</th>
                     <td>{{ score }}</td>
                 </tr>
                 {% endfor %}
             {% endfor %}
         </table>
+        </div>
 
     {% endif %}
 {% endblock %}
