@@ -247,9 +247,9 @@ class TeacherStatsCriteriaView(FormView):
                 progresses = Progress.objects.filter(Q(semester_subject=teacher_subject.subject)
                                                      & Q(student__group__in=teacher_subject.groups))
                 dopkas = AdditionalSession.objects.filter(Q(semester_subject=teacher_subject.subject)
-                                                     & Q(student__group__in=teacher_subject.groups))
+                                                          & Q(student__group__in=teacher_subject.groups))
                 commissions = Commission.objects.filter(Q(semester_subject=teacher_subject.subject)
-                                                     & Q(student__group__in=teacher_subject.groups))
+                                                        & Q(student__group__in=teacher_subject.groups))
 
                 teacher.dopkas += len(dopkas)
                 teacher.commissions += len(commissions)
@@ -283,11 +283,12 @@ def group_rating(request):
     ctx = {'form': make_form(form_name='form', form_init=init)}
     group_rating = {}
     group_score_by_subjects = {}
+    subjects = None
     if request.method == 'POST':
         form = ctx['form'](data=request.POST)
         if form.is_valid():
-            courses = list(form.cleaned_data['course'])  # May list
-            semester = form.cleaned_data['semester']  # May 3 Both
+            courses = list(form.cleaned_data['course'])
+            semester = form.cleaned_data['semester']
             subjects = form.cleaned_data['subject']
             year_start, year_end = form.cleaned_data['date_begin'], form.cleaned_data['date_end']
             years = []
@@ -327,7 +328,8 @@ def group_rating(request):
                         group_score_by_subjects[group.id].append(('-', subject))
                     print(group_score_by_subjects)
             group_rating = sorted(group_rating.items(), key=lambda x: x[0], reverse=True)
+            form.fields['subject'].queryset = form.cleaned_data['subject']
         return render(request, 'itis_data_niffler/templates/group_rating.html',
-                      {'form': make_form(form_name='form', form_init=init), 'group_rating': group_rating,
-                       'group_score_by_subjects': group_score_by_subjects, 'subjects':subjects})
+                      {'form': form, 'group_rating': group_rating,
+                       'group_score_by_subjects': group_score_by_subjects, 'subjects': subjects})
     return render(request, 'itis_data_niffler/templates/group_rating.html', ctx)

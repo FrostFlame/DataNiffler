@@ -75,7 +75,8 @@ class Person(models.Model):
 
     def __str__(self):
         return '%s (%s)' % (
-            self.full_name(), reduce(lambda a, x: str(a) + ', ' + str(x), self.status.all()))
+            self.full_name(),
+            reduce(lambda a, x: str(a) + ', ' + str(x), self.status.all()) if self.status.all().count() > 0  else '')
 
 
 class WorkExperience(models.Model):
