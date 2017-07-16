@@ -74,9 +74,29 @@
             </div>
         {% endfor %}
         {% if not read %}
-            <button type="button" class="button alert-danger" value="">Показать</button>
+            <input type="submit" value="Показать"/>
         {% endif %}
 
 
     </form>
+
+    {% if group_rating %}
+
+        <table border="2"  width="600">
+            <tr>
+
+                <th>Группа</th>
+                <th>Балл</th>
+             </tr>
+            {% for score, groups in group_rating %}
+                {% for group in groups%}
+                <tr>
+                    <td>{{ group }}</td>
+                    <td>{{ score }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </table>
+
+    {% endif %}
 {% endblock %}

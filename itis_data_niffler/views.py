@@ -7,8 +7,8 @@ from django.views.generic import ListView, FormView
 
 from itis_data_niffler.forms import StudentStatsCriteriaForm
 from itis_manage.forms import PersonForm, StudentForm, MagistrForm, LaboratoryForm, LabRequestForm
-from itis_manage.lib import get_unique_object_or_none, LAB_REQUEST_FIELDS, lab_post
-from itis_manage.models import Person, Student, Magistrate, Laboratory, LaboratoryRequests
+from itis_manage.lib import get_unique_object_or_none, LAB_REQUEST_FIELDS, lab_post, get_set_sem
+from itis_manage.models import Person, Student, Magistrate, Laboratory, LaboratoryRequests, NGroup
 
 from django.db.models import Max
 from django.shortcuts import render
@@ -213,11 +213,41 @@ class StudentStatsCriteriaView(FormView):
 
         return self.render_to_response(self.get_context_data(**ctx))
 
+
 def group_rating(request):
-    if request.method=='GET':
-        init = {'base_fields': STUDENT_STATS_SCORE_FIELDS,
-                'field_order': ('date_begin', 'date_end', 'course', 'semester', 'subject')}
-        ctx = {'form': make_form(form_name='form', form_init=init)}
-        return render(request, 'itis_data_niffler/templates/group_rating.html', ctx)
-    else:
-        return HttpResponse('hi')
+    init = {'base_fields': STUDENT_STATS_SCORE_FIELDS,
+            'field_order': ('date_begin', 'date_end', 'course', 'semester', 'subject')}
+    ctx = {'form': make_form(form_name='form', form_init=init)}
+    group_rating = {}
+    if request.method == 'POST':
+        form = ctx['form'](data=request.POST)
+        if form.is_valid():
+            courses = list(form.cleaned_data['course'])  # May list
+            semester = form.cleaned_data['semester']  # May 3 Both
+            subjects = form.cleaned_data['subject']
+            year_start, year_end = form.cleaned_data['date_begin'], form.cleaned_data['date_end']
+            years = []
+            for course in courses:
+                for year in list(range(year_start + 1, year_end + 1)):
+                    years.append(year - int(course))
+                years = list(set(years))
+            groups = NGroup.objects.all().filter(
+                year_of_foundation__in=years)
+            sems = [int(course - 1) * 2 + 1 for course in courses] if semester in [1, 2] else get_set_sem(courses)
+            semester_subject = SemesterSubject.objects.filter(subject__in=subjects, semester__in=sems)
+            for group in groups:
+                group_score = 0
+                progresses = Progress.objects.all().filter(semester_subject__in=semester_subject,
+                                                           student__in=group.group_students.all())
+                for p in progresses:
+                    group_score += p.exam + p.practice
+                if progresses.count() != 0:
+                    if not group_rating.get(group_score / progresses.count()):
+                        group_rating[group_score / progresses.count()] = []
+                        group_rating[group_score / progresses.count()].append(group)
+                    else:
+                        group_rating[group_score / progresses.count()].append(group)
+            group_rating = sorted(group_rating.items(), key=lambda x: x[0], reverse=True)
+        return render(request, 'itis_data_niffler/templates/group_rating.html',
+                      {'form': make_form(form_name='form', form_init=init), 'group_rating': group_rating})
+    return render(request, 'itis_data_niffler/templates/group_rating.html', ctx)
