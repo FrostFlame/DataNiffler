@@ -85,3 +85,11 @@ def set_readable_related_fields(instance, self, ):
 
 def make_form(form_name, form_init, form_class=(f.BaseForm,), ctx=None):
     return type(form_name, form_class, form_init)
+
+
+def today():
+    return datetime.date.today()
+
+
+def age(born):
+    return today().year - born.year - ((today().month, today().day) < (born.month, born.day))

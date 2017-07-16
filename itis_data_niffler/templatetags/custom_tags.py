@@ -16,7 +16,12 @@ def return_model_object_field(model, id, field):
 def progress_id_subject_id(dict, subject_id):
     return dict[subject_id]
 
+
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
 
+
+@register.filter
+def get_attr(obj, key):
+    return getattr(obj, key, None)

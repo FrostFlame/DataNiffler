@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^subject-rating/$', views.subject_rating, name='subject-rating'),
     url(r'^students/stats/score/$', views.students_stats_score, name='student-rating'),
     url(r'^students/stats/criteria$', views.StudentStatsCriteriaView.as_view(), name='student-criteria'),
+    url(r'^teachers/stats/criteria$', views.TeacherStatsCriteriaView.as_view(), name='teacher-criteria'),
     url(r'^group/stats/score/$', views.group_rating, name='group-rating'),
 
     # Lab

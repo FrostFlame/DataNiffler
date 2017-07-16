@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, FormView
 
-from itis_data_niffler.forms import StudentStatsCriteriaForm
+from itis_data_niffler.forms import StudentStatsCriteriaForm, TeacherStatsCriteriaForm
 from itis_manage.forms import PersonForm, StudentForm, MagistrForm, LaboratoryForm, LabRequestForm
 from itis_manage.lib import get_unique_object_or_none, LAB_REQUEST_FIELDS, lab_post, get_set_sem
 from itis_manage.models import Person, Student, Magistrate, Laboratory, LaboratoryRequests, NGroup
@@ -14,7 +14,7 @@ from django.db.models import Max
 from django.shortcuts import render
 from datetime import datetime, date, time
 from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS, SEMESTER_CHOICES, \
-    SEMESTER_BOTH
+    SEMESTER_BOTH, today, age
 from itis_manage.models import SemesterSubject, Progress, Subject
 
 import django.forms as f
@@ -180,18 +180,23 @@ def students_stats_score(request):
 
 class StudentStatsCriteriaView(FormView):
     model = Student
-    template_name = 'students_stats_criteria.html'
+    template_name = 'student_stats_criteria.html'
     form_class = StudentStatsCriteriaForm
 
     def form_valid(self, form):
         qs = Student.objects.all()
 
-        semester = int(form.cleaned_data['course']) * 2 + int(form.cleaned_data['course_semester'])
+        course = int(form.cleaned_data['course'])
+        semester = course * 2 + int(form.cleaned_data['course_semester'])
         year_start, year_end = form.cleaned_data['year_start'], form.cleaned_data['year_end']
 
-        qs = qs.filter(group__year_of_foundation__range=[year_start - semester // 2, year_end - semester // 2])
+        # Students studied on the given course during the given period of time
+        qs = qs.filter(group__year_of_foundation__range=[year_start - (course - 1), year_end - (course - 1)])
 
         students = qs
+
+        # Prefetch all the fields we will now process for efficiency
+        students.prefetch_related('dopkas', 'commissions', 'attendance', 'progresses')
         for stud in students:
             stud.events = stud.events.filter(date__year__range=[year_start, year_end])
             stud.dopkas = stud.dopkas.filter(subject__semester__semester=semester)
@@ -210,6 +215,41 @@ class StudentStatsCriteriaView(FormView):
         }
 
         # TODO columns
+
+        return self.render_to_response(self.get_context_data(**ctx))
+
+
+class TeacherStatsCriteriaView(FormView):
+    template_name = 'generic_stats_criteria.html'
+    form_class = TeacherStatsCriteriaForm
+
+    def form_valid(self, form):
+        qs = Person.objects.filter(teacher_subjects__isnull=False)
+        subject = form.cleaned_data.get('subject', None)
+        if subject is not None:
+            qs = qs.filter(teacher_subjects__subject=subject)
+
+        teachers = qs
+        teachers.prefetch_related('teacher_subjects')
+        for teacher in teachers:
+            # TODO experience (NA in current model)
+            # TODO dopkas (NA in current model)
+            # TODO commisions (NA in current model)
+            # TODO avg ball (NA in current model)
+            teacher.num_hours = sum([subject.lesson_count for subject in teacher.teacher_subjects])
+            teacher.num_subjects = len(teacher.teacher_subjects)
+            teacher.age = age(teacher.birth_date)
+
+        ctx = {
+            'form': form,
+            'objects': teachers,
+            'fields': {
+                'Имя': 'full_name',
+                'Число предметов': 'num_subjects',
+                'Возраст': 'age',
+                'Число часов': 'num_hours'
+            }
+        }
 
         return self.render_to_response(self.get_context_data(**ctx))
 

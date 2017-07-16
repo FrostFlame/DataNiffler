@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+
+{% block extrahead %}
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.min.js' %}"></script>
+{% endblock %}
+
+{% block jquery %}
+    $('#list').tablesorter();
+{% endblock %}
+
+{% block content %}
+    <form class="form-horizontal" method="post">
+        {% include 'form_contents.html' %}
+    </form>
+
+    <div>
+        <table class="table table-hover tablesorter" id="list">
+            <thead>
+            {% for name, _ in fields.items %}
+                <th>{{ name }}</th>
+            {% endfor %}
+            </thead>
+            <tbody>
+                {% for object in objects %}
+                    <tr>
+                    {% for _, key in fields.items %}
+                        <td>
+                            {{ object|get_attr:key }}
+                        </td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
