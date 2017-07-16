@@ -23,16 +23,23 @@ SEMESTER_CHOICES = (
     (3, 'Оба')
 )
 
+YEAR_CHOICES_S = ((i, i) for i in range(2000, datetime.datetime.today().year))
+YEAR_CHOICES_E = ((i, i) for i in range(2000, datetime.datetime.today().year + 1))
 CONTEXT = {
     ''
 }
+YEAR_TODAY = datetime.datetime.today().year
 
 STUDENT_STATS_SCORE_FIELDS = {
-    'date_begin': f.IntegerField(initial=datetime.datetime.today().year - 1),
-    'date_end': f.IntegerField(initial=datetime.date.today().year),
-    'course': f.MultipleChoiceField(choices=COURSE_CHOICES, widget=autocomplete.Select2Multiple()),
-    'semester': f.ChoiceField(choices=SEMESTER_CHOICES, initial=3, widget=autocomplete.Select2()),
-    'subject': f.ModelMultipleChoiceField(queryset=Subject.objects.all(), widget=autocomplete.ModelSelect2Multiple()),
+    'date_begin': f.IntegerField(initial=YEAR_TODAY - 1,
+                                 widget=autocomplete.Select(choices=YEAR_CHOICES_S), required=True),
+    'date_end': f.IntegerField(initial=YEAR_TODAY,
+                               widget=autocomplete.Select(choices=YEAR_CHOICES_E), required=True),
+    'course': f.MultipleChoiceField(choices=COURSE_CHOICES, initial=COURSE_CHOICES[0],
+                                    widget=autocomplete.Select2Multiple(), required=True),
+    'semester': f.ChoiceField(choices=SEMESTER_CHOICES, initial=3, widget=autocomplete.Select2(), required=True),
+    'subject': f.ModelMultipleChoiceField(queryset=Subject.objects.all(), widget=autocomplete.ModelSelect2Multiple(),
+                                          required=True),
 }
 
 

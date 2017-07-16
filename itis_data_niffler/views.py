@@ -167,15 +167,14 @@ def students_stats_score(request):
                 student_score = 0
                 for p in progresses:
                     student_score += p.get_final_points()
-                student_rating[student_score] = []
+                if student_score not in student_rating:
+                    student_rating[student_score] = []
                 student_rating[student_score / progresses.count()].append(student.id)
-                student_rating = sorted(student_rating.items(), key=lambda x: x[0], reverse=True)
+            student_rating = sorted(student_rating.items(), key=lambda x: x[0], reverse=True)
                 # For separated tables
                 # subj = SemesterSubject.objects.filter(semester_subject_progresses__in=progresses)
-                ctx['students'] = students
-                ctx['progresses'] = progresses
-                ctx['student_rating'] = student_rating
-                # ctx['subj'] = subj
+            ctx['student_rating'] = student_rating
+            # ctx['subj'] = subj
     return render(request, 'itis_data_niffler/templates/students_stats_score.html', ctx)
 
 
