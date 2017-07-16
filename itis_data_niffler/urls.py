@@ -15,8 +15,9 @@ urlpatterns = [
     url(r'^common-rating/$', views.common_rating, name='common-rating'),
     url(r'^subject-rating/$', views.subject_rating, name='subject-rating'),
     url(r'^students/stats/score/$', views.students_stats_score, name='student-rating'),
-    url(r'^students/stats/criteria$', views.StudentStatsCriteriaView.as_view(), name='student-criteria'),
-    url(r'^teachers/stats/criteria$', views.TeacherStatsCriteriaView.as_view(), name='teacher-criteria'),
+    url(r'^student/stats/criteria$', views.StudentStatsCriteriaView.as_view(), name='student-criteria'),
+    url(r'^teacher/stats/criteria$', views.TeacherStatsCriteriaView.as_view(), name='teacher-criteria'),
+    url(r'^group/stats/criteria$', views.GroupStatsCriteriaView.as_view(), name='group-criteria'),
     url(r'^group/stats/score/$', views.group_rating, name='group-rating'),
 
     # Lab

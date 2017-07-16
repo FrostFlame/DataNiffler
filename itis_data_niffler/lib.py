@@ -84,3 +84,12 @@ def set_readable_related_fields(instance, self, ):
 
 def make_form(form_name, form_init, form_class=(f.BaseForm,), ctx=None):
     return type(form_name, form_class, form_init)
+
+
+def stud_filter_data(stud, semester, year_start, year_end):
+    stud.events = stud.events.filter(date__year__range=[year_start, year_end])
+    stud.dopkas = stud.dopkas.filter(subject__semester=semester)
+    stud.commissions = stud.commissions.filter(subject__semester=semester)
+    stud.attendance = stud.attendance.filter(
+        _class__teacher_group__subject__subject__semester=semester)
+    stud.progresses = stud.progresses.filter(semester_subject__semester=semester)

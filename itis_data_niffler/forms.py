@@ -38,3 +38,8 @@ class TeacherStatsCriteriaForm(forms.Form):
     subject = forms.ModelChoiceField(Subject.objects.all(), required=False)
 
     criterion = forms.ChoiceField(choices=CRITERIA_CHOICES)
+
+
+class GroupStatsCriteriaForm(StudentStatsCriteriaForm):
+    # Could've added more criteria but they're not used anyway so let it be
+    pass

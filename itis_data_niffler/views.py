@@ -8,20 +8,14 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views.generic import FormView
 
-from itis_data_niffler.forms import StudentStatsCriteriaForm, TeacherStatsCriteriaForm
-from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS
-from practice2017.lib import age
+from itis_data_niffler.forms import StudentStatsCriteriaForm, TeacherStatsCriteriaForm, GroupStatsCriteriaForm
+from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS, stud_filter_data
 from itis_manage.forms import PersonForm, StudentForm, MagistrForm, LaboratoryForm, LabRequestForm
 from itis_manage.lib import get_unique_object_or_none, get_set_sem
 from itis_manage.models import Person, Student, Magistrate, Laboratory, LaboratoryRequest, NGroup, TeacherSubject, \
     AdditionalSession, Commission
 from itis_manage.models import SemesterSubject, Progress, Subject
-
-MARK_THRESHOLDS = (0, 0, 0,
-                   56,
-                   71,
-                   86
-                   )
+from practice2017.lib import age, avg, today, BACHELOR_YEARS, MASTER_YEARS, MARK_THRESHOLDS
 
 
 def view_person(request, person_id=None):
@@ -165,8 +159,8 @@ def students_stats_score(request):
                 student_score = 0
                 student_rating[student.id] = {}
                 for p in progresses:
-                    student_score += p.get_final_points()
-                    student_rating[student.id].update({p.semester_subject.id: p.get_final_points()})
+                    student_score += p.total()
+                    student_rating[student.id].update({p.semester_subject.id: p.total()})
                 student_rating[student.id].update({'final': student_score / progresses.count()})
             print(student_rating.items())
             student_rating = sorted(student_rating.items(), key=lambda x: x[1]['final'], reverse=True)
@@ -177,8 +171,26 @@ def students_stats_score(request):
     return render(request, 'itis_data_niffler/templates/students_stats_score.html', ctx)
 
 
+class StatsCriteriaViewBase(FormView):
+    template_name = 'generic_stats_criteria.html'
+    fields = None
+
+    def get_objects(self, form):
+        raise NotImplementedError("get_objects method must be implemented")
+
+    def form_valid(self, form):
+        if self.fields is None:
+            raise NotImplementedError("fields must be overridden in child classes")
+        ctx = {
+            'form': form,
+            'fields': self.fields,
+            'objects': self.get_objects(form)
+        }
+
+        return self.render_to_response(self.get_context_data(**ctx))
+
+
 class StudentStatsCriteriaView(FormView):
-    model = Student
     template_name = 'student_stats_criteria.html'
     form_class = StudentStatsCriteriaForm
 
@@ -197,32 +209,93 @@ class StudentStatsCriteriaView(FormView):
         # Prefetch all the fields we will now process for efficiency
         students.prefetch_related('dopkas', 'commissions', 'attendance', 'progresses')
         for stud in students:
-            stud.events = stud.events.filter(date__year__range=[year_start, year_end])
-            stud.dopkas = stud.dopkas.filter(subject__semester__semester=semester)
-            stud.commissions = stud.commissions.filter(subject__semester__semester=semester)
-            stud.attendance = stud.attendance.filter(
-                _class__teacher_group__subject__subject__semester__semester=semester)
-            stud.progresses = stud.progresses.filter(semester_subject__semester__semester=semester)
+            stud_filter_data(stud, semester, year_start, year_end)
 
-            stud.balls = reduce(lambda ev1, ev2: ev1.balls + ev2.balls, stud.events, 0)
+            stud.balls = reduce(lambda ev1, ev2: ev1.points + ev2.points, stud.events, 0)
             stud.five_count = len(list(filter(
-                lambda progress: progress.practice + progress.exam >= MARK_THRESHOLDS[5], stud.progresses)))
+                lambda progress: progress.total() >= MARK_THRESHOLDS[5], stud.progresses)))
 
         ctx = {
             'form': form,
             'students': students
         }
 
-        # TODO columns
-
         return self.render_to_response(self.get_context_data(**ctx))
 
 
-class TeacherStatsCriteriaView(FormView):
-    template_name = 'generic_stats_criteria.html'
-    form_class = TeacherStatsCriteriaForm
+class GroupStatsCriteriaView(StatsCriteriaViewBase):
+    form_class = GroupStatsCriteriaForm
+    fields = {
+        'Название': 'name',
+        'Мероприятия': 'events',
+        'Доп. баллы': 'balls',
+        'Доп. сессии': 'dopkas',
+        'Комиссии': 'commissions',
+        'Прогулы': 'absences',
+        'Средний балл': 'avg_score',
+        'Пятерки': 'fives',
+        'Количество студентов': 'count',
+        'Восттановленных': 'recovered',
+        'Общажных': 'dormed',
+        'Бакалавры?': 'is_bachelor',
+        'Выпустилась?': 'is_graduated'
+    }  # TODO golden sessions
 
-    def form_valid(self, form):
+    attrs = {
+        'events':   lambda group: avg([len(stud.events) for stud in group.group_students]),
+        'balls':    lambda group: avg([sum([event.points for event in stud.events]) for stud in group.group_students]),
+        'dopkas':   lambda group: avg([len(stud.dopkas) for stud in group.group_students]),
+        'commissions':  lambda group: avg([len(stud.commissions) for stud in group.group_students]),
+        'absences': lambda group: avg([len(stud.attendance) for stud in group.group_students]),
+        'avg_score':    lambda group: avg([avg([p.total() for p in stud.progresses]) for stud in group.group_students]),
+        'fives':    lambda group: avg([sum([p.total() >= MARK_THRESHOLDS[5] for p in stud.progresses]) for stud in group.group_students]),
+        'count':    lambda group: len(group.group_students),
+        'foreigners':   lambda group: sum([stud.city.country != 'Россия' for stud in group.group_students]),
+        'recovered':    lambda group: sum([len(stud.vacations) > 0 for stud in group.group_students]),
+        'dormed':   lambda group: sum([len(stud.dorms) > 0 for stud in group.group_students]),
+        'avg_class_start':  lambda group: avg([cl.lesson.begin.hour*60 + cl.lesson.begin.minute
+                                               for tg in group.teachers for cl in tg.classes])  # TODO convert to time
+        # TODO golden sessions
+    }
+
+    def get_objects(self, form):
+        qs = NGroup.objects.all()
+
+        course = int(form.cleaned_data['course'])
+        semester = course * 2 + int(form.cleaned_data['course_semester'])
+        year_start, year_end = form.cleaned_data['year_start'], form.cleaned_data['year_end']
+
+        groups = qs.filter(year_of_foundation__range=[year_start - (course - 1), year_end - (course - 1)])
+
+        for group in groups:
+            for stud in group.group_students:
+                stud_filter_data(stud, semester, year_start, year_end)
+
+            for attr, f in self.attrs:
+                setattr(group, attr, f(group))
+
+            group.is_bachelor = not group.group_students.filter(magistr_student__isnull=False).exists()
+            group.is_graduated = today().year >= group.year_of_foundation + BACHELOR_YEARS + int(group.is_bachelor)*MASTER_YEARS
+
+        return groups
+
+
+class TeacherStatsCriteriaView(StatsCriteriaViewBase):
+    form_class = TeacherStatsCriteriaForm
+    fields = {
+        'Имя': 'full_name',
+        'Число предметов': 'num_subjects',
+        'Возраст': 'age',
+        'Число часов': 'num_hours',
+        'Страна': 'city.country',
+        'Город': 'city',
+        'Стаж': 'experience.exp_total',
+        'Средний балл': 'avg_score',
+        'Доп. сессии': 'dopkas',
+        'Комиссии': 'commissions'
+    }
+
+    def get_objects(self, form):
         qs = Person.objects.filter(teacher_subjects__isnull=False)
         subject = form.cleaned_data.get('subject', None)
         if subject is not None:
@@ -257,24 +330,7 @@ class TeacherStatsCriteriaView(FormView):
 
             teacher.avg_score = sum(scores) / len(scores)
 
-        ctx = {
-            'form': form,
-            'objects': teachers,
-            'fields': {
-                'Имя': 'full_name',
-                'Число предметов': 'num_subjects',
-                'Возраст': 'age',
-                'Число часов': 'num_hours',
-                'Страна': 'city.country',
-                'Город': 'city',
-                'Стаж': 'experience.exp_total',
-                'Средний балл': 'avg_score',
-                'Доп. сессии': 'dopkas',
-                'Комиссии': 'commissions'
-            }
-        }
-
-        return self.render_to_response(self.get_context_data(**ctx))
+        return teachers
 
 
 def group_rating(request):

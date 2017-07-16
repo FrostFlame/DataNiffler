@@ -3,7 +3,7 @@ from functools import reduce
 
 from django.db import models
 
-from practice2017.lib import today
+from practice2017.lib import today, MARK_THRESHOLDS
 
 
 class Status(models.Model):
@@ -227,8 +227,11 @@ class Progress(models.Model):
     class Meta:
         unique_together = (('semester_subject', 'student'),)
 
-    def get_final_points(self):
+    def total(self):
         return self.practice + self.exam
+
+    def gold_eligible(self):
+        return self.total() >= MARK_THRESHOLDS[5]
 
 
 class TeacherSubject(models.Model):
@@ -272,6 +275,12 @@ class Commission(models.Model):
     datetime = models.DateTimeField('Дата пересдачи')
 
 
+class AcademicVacation(models.Model):
+    student = models.ForeignKey(Student, related_name='vacations')
+    prev_group = models.ForeignKey(NGroup, related_name='students_vacated')
+    year = models.PositiveSmallIntegerField('Год')
+
+
 class Lesson(models.Model):
     num = models.SmallIntegerField('Номер пары')
     begin = models.TimeField('Время начала')
@@ -293,9 +302,21 @@ class TimetableClass(models.Model):
     day_of_week = models.SmallIntegerField('День недели')
     teacher_group = models.ForeignKey(TeacherGroup, related_name='classes')
     period = models.SmallIntegerField(choices=PERIOD_TYPES, default=EACH)
+    lesson = models.ForeignKey(Lesson, related_name='+')
 
 
 class AbsenceEntry(models.Model):
     _class = models.ForeignKey(TimetableClass, related_name='attendance')
     student = models.ForeignKey(Student, related_name='attendance')
     date = models.DateField('Дата занятия')
+
+
+class Dormitory(models.Model):
+    name = models.CharField('Название', max_length=50)
+    address = models.CharField('Адрес', max_length=200)
+
+
+class StudentDormitory(models.Model):
+    student = models.ForeignKey(Student, related_name='dorms')
+    dormitory = models.ForeignKey(Dormitory, related_name='all_students')
+    year = models.PositiveSmallIntegerField('Год')
