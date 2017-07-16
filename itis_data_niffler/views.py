@@ -142,6 +142,7 @@ def students_stats_score(request):
     init = {'base_fields': STUDENT_STATS_SCORE_FIELDS,
             'field_order': ('date_begin', 'date_end', 'course', 'semester', 'subject')}
     ctx = {'form': make_form(form_name='form', form_init=init)}
+
     if request.method == 'POST':
         form = ctx['form'](data=request.POST)
         ctx['form'] = form
@@ -159,22 +160,21 @@ def students_stats_score(request):
                 'group__year_of_foundation__in': years_list,
                 'progresses__semester_subject__subject__in': subjects,
             }
-            students = Student.objects.filter(**kwargs).order_by('progresses__semester_subject')
-            # Get semester
+            students = Student.objects.filter(**kwargs).order_by('progresses__semester_subject__subject')
             student_rating = {}
             for student in students:
-                progresses = Progress.objects.filter(student=student)
+                progresses = Progress.objects.filter(student=student, semester_subject__subject__in=subjects)
                 student_score = 0
+                student_rating[student.id] = {}
                 for p in progresses:
                     student_score += p.get_final_points()
-                if student_score not in student_rating:
-                    student_rating[student_score] = []
-                student_rating[student_score / progresses.count()].append(student.id)
-            student_rating = sorted(student_rating.items(), key=lambda x: x[0], reverse=True)
-                # For separated tables
-                # subj = SemesterSubject.objects.filter(semester_subject_progresses__in=progresses)
+                    student_rating[student.id].update({p.semester_subject.id: p.get_final_points()})
+                student_rating[student.id].update({'final': student_score})
+                # student_score / progresses.count()
+            print(student_rating.items())
+            student_rating = sorted(student_rating.items(), key=lambda x: x[1]['final'], reverse=True)
             ctx['student_rating'] = student_rating
-            # ctx['subj'] = subj
+            ctx['student_subjects'] = SemesterSubject.objects.filter(id__in=subjects).order_by('id')
     return render(request, 'itis_data_niffler/templates/students_stats_score.html', ctx)
 
 

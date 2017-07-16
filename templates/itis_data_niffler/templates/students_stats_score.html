@@ -70,8 +70,6 @@
         {% if not read %}
             <button type="submit" class="button alert-danger" value="">Показать</button>
         {% endif %}
-
-
     </form>
     {% if student_rating %}
         <div class="col-md-10 col-md-offset-1">
@@ -96,11 +94,14 @@
                         <th class="hidden-xs">ID</th>
                         <th>Имя</th>
                         <th>Группа</th>
+                        {% for subject in student_subjects %}
+                            <th>{{  subject.subject.name}}</th>
+                        {% endfor %}
                         <th>Средний бал</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for score, student in student_rating %}
+                    {% for student_id, student_extras in student_rating %}
                         <tr>
                             {% comment %}<td align="center">
                               <a class="btn btn-default"><em class="fa fa-pencil"></em></a>
@@ -108,10 +109,13 @@
                             </td>
                             {% endcomment %}
 
-                            <td class="hidden-xs">{{ student.0 }}</td>
-                            <td>{% return_model_object_field model='Student' id=student.0 field='person' %} </td>
-                            <td>{% return_model_object_field model='Student' id=student.0 field='group' %}</td>
-                            <td>{{ score }}</td>
+                            <td class="hidden-xs">{{ student_id }}</td>
+                            <td>{% return_model_object_field model='Student' id=student_id field='person' %} </td>
+                            <td>{% return_model_object_field model='Student' id=student_id field='group' %}</td>
+                            {% for subject in student_subjects %}
+                                <td>{% progress_id_subject_id dict=student_extras subject_id=subject.subject.id %}</td>
+                            {% endfor %}
+                            <td>{% progress_id_subject_id dict=student_extras subject_id='final' %}</td>
 
                         </tr>
                     {% endfor %}

@@ -25,6 +25,5 @@ def get_subjects(request):
             semesters = get_set_sem_on(courses, int(semester))
         else:
             semesters = get_set_sem(courses)
-        print(semesters)
         subjects = SemesterSubject.objects.filter(semester__in=semesters).values('subject__id', 'subject__name')
         return JsonResponse(list(subjects), safe=False)
