@@ -34,7 +34,7 @@ STUDENT_STATS_SCORE_FIELDS = {
                                  widget=autocomplete.Select(choices=YEAR_CHOICES_S), required=True),
     'date_end': f.IntegerField(initial=YEAR_TODAY,
                                widget=autocomplete.Select(choices=YEAR_CHOICES_E), required=True),
-    'course': f.MultipleChoiceField(choices=COURSE_CHOICES, initial=COURSE_CHOICES[0],
+    'course': f.MultipleChoiceField(choices=COURSE_CHOICES,
                                     widget=autocomplete.Select2Multiple(), required=True),
     'semester': f.ChoiceField(choices=SEMESTER_CHOICES, initial=3, widget=autocomplete.Select2(), required=True),
     'subject': f.ModelMultipleChoiceField(queryset=Subject.objects.all(), widget=autocomplete.ModelSelect2Multiple(),
