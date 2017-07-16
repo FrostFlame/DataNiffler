@@ -95,9 +95,12 @@
                         <th>Имя</th>
                         <th>Группа</th>
                         {% for subject in student_subjects %}
-                            <th>{{  subject.subject.name}}</th>
+                            <th>{{ subject.subject.name }}</th>
                         {% endfor %}
-                        <th>Средний бал</th>
+                        {% ifequal student_subjects|length 1 %}
+                            {% else %}
+                            <th>Средний бал</th>
+                        {% endifequal %}
                     </tr>
                     </thead>
                     <tbody>
@@ -115,7 +118,10 @@
                             {% for subject in student_subjects %}
                                 <td>{% progress_id_subject_id dict=student_extras subject_id=subject.subject.id %}</td>
                             {% endfor %}
-                            <td>{% progress_id_subject_id dict=student_extras subject_id='final' %}</td>
+                            {% ifequal student_subjects|length 1 %}
+                                {% else %}
+                                <td>{% progress_id_subject_id dict=student_extras subject_id='final' %}</td>
+                            {% endifequal %}
 
                         </tr>
                     {% endfor %}
