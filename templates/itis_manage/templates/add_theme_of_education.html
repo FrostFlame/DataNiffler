@@ -62,7 +62,16 @@
 {% block content %}
     <script type="text/html" id="item-template">
         <div id="form-gorup">
-            {{ formset.empty_form }}
+            {% for field in formset.empty_form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field|add_class:'form-control' }}
+                    {% for error in field.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+
+                </div>
+            {% endfor %}
         </div>
     </script>
     {% if messages %}
