@@ -390,7 +390,8 @@ def group_rating(request):
             form.fields['subject'].queryset = form.cleaned_data['subject']
         return render(request, 'itis_data_niffler/templates/group_rating.html',
                       {'form': form, 'group_rating': group_rating,
-                       'group_score_by_subjects': group_score_by_subjects, 'subjects': subjects})
+                       'group_score_by_subjects': group_score_by_subjects, 'subjects': subjects,
+                       'subjects_more_than_one': len(subjects) > 1})
     return render(request, 'itis_data_niffler/templates/group_rating.html', ctx)
 
 
