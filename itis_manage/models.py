@@ -272,7 +272,29 @@ class TeacherSubject(models.Model):
 
     subject = models.ForeignKey(SemesterSubject, related_name='teachers')
     person = models.ForeignKey(Person, related_name='teacher_subjects')
-    lesson_count = models.SmallIntegerField('Количество часов')
+    # lesson_count = models.SmallIntegerField('Количество часов')
+
+
+class Program(models.Model):
+    name = models.CharField(max_length=80)
+    year_of_foundation = models.IntegerField()
+
+
+class ProgramSemesterSubject(models.Model):
+    program = models.ForeignKey(Program, related_name='semester_subjects')
+    semester_subject = models.ForeignKey(SemesterSubject, related_name='program')
+    amount_of_lectures = models.SmallIntegerField()
+    amount_of_practice = models.SmallIntegerField()
+    amount_of_laboratories = models.SmallIntegerField()
+
+
+class ThemesOfEducation(models.Model):
+    name = models.CharField(max_length=80)
+
+
+class ProgramSemesterSubjectThemesOfEducation(models.Model):
+    program_semester_subject = models.ForeignKey(ProgramSemesterSubject, related_name='themes_of_education')
+    themes_of_education = models.ForeignKey(ThemesOfEducation, related_name='program_semester_subject')
 
 
 class TeacherGroup(models.Model):

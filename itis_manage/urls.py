@@ -16,7 +16,10 @@ urlpatterns = [
     # Group
     url(r'^group/add$', AddGroupView.as_view(), name='create-group'),
     url(r'^group/(?P<pk>(\d+))$', EditGroupView.as_view(), name='edit-group'),
-    url(r'^subject/add$', add_subject, name='create-subject'),
+
+    # Subject
+    url(r'^subject/add$', views.add_subject, name='create-subject'),
+    url(r'^subject/semesters/add$', views.add_subject_semesters, name='create-subject-semesters'),
 
     # Lab
     url(r'^lab/(?P<lab_id>(\d+)|add)$', views.lab_view, name='add-edit-delete-lab'),
@@ -30,6 +33,6 @@ urlpatterns = [
     url(r'^ajax/curators$', CuratorAutocompleteView.as_view(), name='ajax-curators'),
     url(r'^ajax/statuses$', GetObjects.as_view(**{'model': Status}), name='ajax-statuses'),
     url(r'^ajax/students$', GetObjects.as_view(**{'model': Student}), name='ajax-students'),
-    url(r'^get_teachers/$', views.teachers_ajax, name='teacher-ajax'),
+    url(r'^ajax/get_teachers/$', views.teachers_ajax, name='ajax-teachers'),
     url(r'^ajax/get_subjects/$', get_subjects, name='ajax-get-subjects'),
 ]

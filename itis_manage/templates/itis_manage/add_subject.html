@@ -37,7 +37,7 @@
                 $('.toAppend').empty();
             });
 
-            function getTeachers(value) {
+            function getTeachers(value, j) {
                 $.ajax({
                     'url': '/manage/get_teachers/',
                     'data': {
@@ -47,25 +47,42 @@
                     'success': function (json) {
                         for (var i = 0, len = json['res'].length; i < len; i++) {
                             build_results(i, json['res'][i]);
+                            add_to_selected(i, j);
                         }
                     }
                 })
             }
 
+            var added_set = new Set();
+
+            function add_to_selected(i, j) {
+{#                todo add hidden multyple seletc #}
+                $('#teacher_line' + i).click(function () {
+                    var line = $(this);
+                    var added = $('<p></p>').text(line.text()).attr('id', 'added' + i + j);
+                    $('#selected_results' + j).append(added);
+                    var delete_btn = $('<span> X </span>').attr('id', 'delete' + i + j);
+                    $('#selected_results' + j).append(delete_btn);
+                    $('#results' + j).empty();
+                    
+                    $('#delete' + i + j).click(function () {
+                        $('#added' + i + j).hide();
+                        $('#delete' + i + j).hide();
+                        added_set.delete(line.text());
+                    })
+                });
+            }
+
             function build_results(i, json) {
                 var full_name = json['surname'] + ' ' + json['name'] + ' ' + json['third_name'];
 
-{#                todo solve this problem with set #}
-                var added_set = new Set();
-                if (added_set.has(full_name)) {
-                    alert('has!');
-                }
-                else {
+                if (!added_set.has(full_name)) {
                     added_set.add(full_name);
                     var line = $('<p></p>').text(full_name);
                     line.attr('id', 'teacher_line' + i);
                     $('#results' + i).append(line);
                 }
+
             }
 
             function whenSelected() {
@@ -77,6 +94,7 @@
                     $('.toAppend').append($('<label></label>').text('Преподаватель:'));
                     $('.toAppend').append($('<br>'));
                     var teacher_search = $('<input type="text">').attr('id', 'teacher' + i).attr('name', 'teacher' + i);
+                    var selected_results = $('<div></div>').attr('id', 'selected_results' + i);
                     var results = $('<div></div>').attr('id', 'results' + i);
 
                     var type_select = $('<select></select>').attr('id', 'type' + i).attr('name', 'type' + i);
@@ -87,6 +105,7 @@
 
 
                     $('.toAppend').append($('<h3></h3>').text('Семестр №' + item));
+                    $('.toAppend').append(selected_results);
                     $('.toAppend').append(teacher_search);
                     $('.toAppend').append(results);
 
@@ -105,7 +124,7 @@
 
                     $('#teacher' + i).on('input', function () {
                         var value = $('#teacher' + i).val();
-                        getTeachers(value);
+                        getTeachers(value, i);
                     });
 
 

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Data Niffler - Add subject
+{% endblock %}
+
+{% block extrahead %}
+    <link href="/static/css/fastselect.min.css" type="text/css" media="all" rel="stylesheet"/>
+    <script type="text/javascript" src="/static/js/fastselect.min.js"></script>
+    <script type="text/javascript" src="/static/js/fastselect.standalone.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>Добавление предмета {{ name }}</h1>
+    <form method="post" id="post_form">
+        {% csrf_token %}
+
+        {% for sem in semesters %}
+            <p>Семестр {{ sem }}</p>
+            {{ teacher_form }}
+            <br>
+        {% endfor %}
+
+        <br>
+        <button type="submit" value="">Продолжить</button>
+    </form>
+{% endblock %}
