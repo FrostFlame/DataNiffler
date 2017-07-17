@@ -2,17 +2,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Q
-from django.forms import formset_factory, modelformset_factory
+from django.forms import formset_factory
 from django.http import HttpResponse, HttpResponseRedirect as Redirect
 from django.http import JsonResponse
-
 from itis_data_niffler.lib import make_form
-from itis_manage.fields import ADD_THEME_FORM_FIELDS
-from itis_manage.models import Subject, SemesterSubject, Course, Status, ThemeOfEducation, TeacherSubject
+from itis_manage.models import TeacherSubject
+from itis_manage.fields import ADD_THEME_FORM_FIELDS, ADD_PROGRESS_STUDENT_FIELDS
+from itis_manage.models import Subject, SemesterSubject, ThemeOfEducation, Progress
 from django.views.generic import *
 from itis_manage.models import Laboratory
 from itis_manage.forms import GroupForm, LaboratoryForm, LabRequestForm, ThemeOfEducationForm, \
-    TeacherForm
+    TeacherForm, ProgressFormSet
 from itis_manage.models import NGroup, LaboratoryRequest
 from itis_manage.forms import MagistrForm
 from django.shortcuts import render, get_object_or_404
@@ -248,3 +248,29 @@ def lab_requests(request):
 
 def view_persons(request):
     return HttpResponse('Persons')
+
+
+def add_scores(request):
+    ctx = {
+        'form': make_form('form', {'base_fields': ADD_PROGRESS_STUDENT_FIELDS,
+                                   'field_order': ('magister', 'group', 'semester', 'type')})}
+    if request.POST:
+        form = ctx['form'](request.POST)
+        if form.is_valid():
+            magister = form.cleaned_data['magister']
+            group = form.cleaned_data['group']
+            semester = form.cleaned_data['semester']
+            type = form.cleaned_data['type']
+            students = Student.objects.filter(group=group,
+                                              progresses__semester_subject__semester=int(semester),
+                                              person__status__name__contains='Студент' if not magister else 'Магистр',
+                                              ).order_by(
+                'person__surname')
+            semester_subjects = SemesterSubject.objects.filter(semester=int(semester), )
+            progresses = Progress.objects.filter(semester_subject__semester=semester, student__in=students).order_by(
+                'students__person__surname')
+            ctx['formsformsets'] = {}
+            for student in students:
+                ctx['formsformsets'].update({student.id: ProgressFormSet(prefix=student.id)})
+            ctx['form'] = form
+    return render(request, 'templates/add_score.html', ctx)

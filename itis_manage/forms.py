@@ -6,7 +6,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models import Model
-from django.forms import widgets, inlineformset_factory, ModelChoiceField, ModelMultipleChoiceField
+from django.forms import widgets, inlineformset_factory, ModelChoiceField, ModelMultipleChoiceField, \
+    modelformset_factory
 from django.shortcuts import get_object_or_404
 import datetime
 
@@ -14,7 +15,7 @@ from django.urls import reverse, reverse_lazy
 
 from itis_data_niffler.lib import set_readable_related_fields
 from itis_manage.models import Student, NGroup, Person, Status, Magistrate, Laboratory, LaboratoryRequest, \
-    ThemeOfEducation, SemesterSubject, TeacherSubject
+    ThemeOfEducation, SemesterSubject, TeacherSubject, Progress
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Field
 from datetimewidget.widgets import DateTimeInput, DateWidget, DateTimeWidget
@@ -118,6 +119,8 @@ class MagistrForm(ReadOnlySupportMixin, forms.ModelForm):
         model = Magistrate
         fields = ('_from',)
 
+    _from = forms.CharField(required=False)
+
     def save(self, *args, **kwargs):
         if self.is_valid():
             magistr = super(MagistrForm, self).save(commit=False)
@@ -148,8 +151,24 @@ class TeacherForm(ReadOnlySupportMixin, forms.ModelForm):
         widgets = {
             'person': autocomplete.ModelSelect2(url='manage:ajax-teachers')}
 
+
 class ThemeOfEducationForm(ReadOnlySupportMixin, forms.ModelForm):
     class Meta:
         model = ThemeOfEducation
         fields = ('name',)
         widgets = {'name': forms.widgets.TextInput(), }
+
+
+class ProgressForm(forms.ModelForm):
+    class Meta:
+        model = Progress
+        fields = ('semester_subject', 'practice', 'exam')
+
+
+class StudentFormForProgress(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = ('id',)
+
+
+ProgressFormSet = modelformset_factory(Progress, ProgressForm, extra=3)

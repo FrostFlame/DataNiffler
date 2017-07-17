@@ -30,6 +30,11 @@ def get_attr(obj, key):
     return getattr(obj, key, None)
 
 
+@register.assignment_tag(name='get_attr')
+def get_attr(obj, key):
+    return obj[key]
+
+
 @register.filter(name='getattr2')
 def get_attr_nested(obj, key):
     """

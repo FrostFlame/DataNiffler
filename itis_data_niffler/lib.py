@@ -30,9 +30,9 @@ CONTEXT = {
 YEAR_TODAY = datetime.datetime.today().year
 
 LAB_CRITERIA_CHOICES = (
-    ('rq','Количество поданных заявок'),
-    ('srp','Процент принятых заявок'),
-    ('pq','Количество человек')
+    ('rq', 'Количество поданных заявок'),
+    ('srp', 'Процент принятых заявок'),
+    ('pq', 'Количество человек')
 )
 
 LAB_RATING_DISPLAY = (
@@ -52,9 +52,12 @@ STUDENT_STATS_SCORE_FIELDS = {
                                           required=True),
 }
 
+# IVAN, use label, not russian syntax)
 LAB_STATS_SCORE_FIELDS = {
-    'Критерий': f.ChoiceField(choices=LAB_CRITERIA_CHOICES, initial='head', widget=autocomplete.Select2(), required=True),
-    'Отображение':  f.MultipleChoiceField(choices=LAB_RATING_DISPLAY, widget=autocomplete.Select2Multiple(), required=True)
+    'Критерий': f.ChoiceField(choices=LAB_CRITERIA_CHOICES, initial='head', widget=autocomplete.Select2(),
+                              required=True),
+    'Отображение': f.MultipleChoiceField(choices=LAB_RATING_DISPLAY, widget=autocomplete.Select2Multiple(),
+                                         required=True)
 }
 
 
