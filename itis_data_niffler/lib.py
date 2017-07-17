@@ -29,6 +29,17 @@ CONTEXT = {
 }
 YEAR_TODAY = datetime.datetime.today().year
 
+LAB_CRITERIA_CHOICES = (
+    ('rq','Количество поданных заявок'),
+    ('srp','Процент принятых заявок'),
+    ('pq','Количество человек')
+)
+
+LAB_RATING_DISPLAY = (
+    ('head', 'Руководитель'),
+    ('direction', 'Направление')
+)
+
 STUDENT_STATS_SCORE_FIELDS = {
     'date_begin': f.IntegerField(initial=YEAR_TODAY - 1,
                                  widget=autocomplete.Select(choices=YEAR_CHOICES_S), required=True),
@@ -39,6 +50,11 @@ STUDENT_STATS_SCORE_FIELDS = {
     'semester': f.ChoiceField(choices=SEMESTER_CHOICES, initial=3, widget=autocomplete.Select2(), required=True),
     'subject': f.ModelMultipleChoiceField(queryset=Subject.objects.all(), widget=autocomplete.ModelSelect2Multiple(),
                                           required=True),
+}
+
+LAB_STATS_SCORE_FIELDS = {
+    'Критерий': f.ChoiceField(choices=LAB_CRITERIA_CHOICES, initial='head', widget=autocomplete.Select2(), required=True),
+    'Отображение':  f.MultipleChoiceField(choices=LAB_RATING_DISPLAY, widget=autocomplete.Select2Multiple(), required=True)
 }
 
 

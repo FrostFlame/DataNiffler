@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+
+{% block title %}
+    Lab Rating
+{% endblock %}
+
+{% block content %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet'
+          type='text/css'>
+    <link href="{% static 'css/table_s.css' %}" rel='stylesheet'
+          type='text/css'>
+
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+            <div  class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field|add_class:'form-control' }}
+
+                {% for error in field.errors %}
+                    <span class="help-block">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        {% if not read %}
+            <button type="submit" class="button btn-success" >Показать</button>
+        {% endif %}
+
+
+    </form>
+
+    {% if labs %}
+        <div style="padding-top: 50px;">
+    <table class="table table-bordered">
+        <tr>
+            <th>Название лаборатории</th>
+            {% if 'direction' in display %}
+                <th>Направление</th>
+            {% endif %}
+            {% if 'head' in display %}
+                <th>Руководитель</th>
+            {% endif %}
+           {% if criteria == "rq" %}
+               <th>Количество поданных заявок</th>
+               {% elif criteria == 'srp'%}
+               <th>Процент принятых заявок</th>
+               {% else %}
+               <th>Количество человек</th>
+           {% endif %}
+        </tr>
+        {% if 'direction' in display and 'head' in display %}
+        {% for lab in labs %}
+            <tr>
+            <td>{{ lab.name }}</td>
+
+                <td>{{ lab.direction.name }}</td>
+                <td>{{ lab.person.full_name }}</td>
+                {% if criteria == "rq" %}
+               <td>{{ lab.request_quantity }}</td>
+               {% elif criteria == 'srp'%}
+               <td>{{ lab.success_requests_percent }}</td>
+               {% else %}
+               <td>{{ lab.people_quantity }}</td>
+           {% endif %}
+            </tr>
+        {% endfor %}
+
+        {% elif 'direction' in display %}
+            {% for lab in labs %}
+            <tr>
+                <td>{{ lab.name }}</td>
+                <td>{{ lab.direction.name }}</td>
+                {% if criteria == "rq" %}
+               <td>{{ lab.request_quantity }}</td>
+               {% elif criteria == 'srp'%}
+               <td>{{ lab.success_requests_percent }}</td>
+               {% else %}
+               <td>{{ lab.people_quantity }}</td>
+           {% endif %}
+            </tr>
+        {% endfor %}
+
+        {% else%}
+            {% for lab in labs %}
+            <tr>
+                <td>{{ lab.name }}</td>
+                <td>{{ lab.person.full_name }}</td>
+            {% if criteria == "rq" %}
+               <td>{{ lab.request_quantity }}</td>
+               {% elif criteria == 'srp'%}
+               <td>{{ lab.success_requests_percent }}</td>
+               {% else %}
+               <td>{{ lab.people_quantity }}</td>
+           {% endif %}
+            </tr>
+            {% endfor %}
+
+        {% endif %}
+    </table>
+        </div>
+    {% endif %}
+
+{% endblock %}

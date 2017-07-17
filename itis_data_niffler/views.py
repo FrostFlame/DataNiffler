@@ -9,7 +9,8 @@ from django.shortcuts import render
 from django.views.generic import FormView
 
 from itis_data_niffler.forms import StudentStatsCriteriaForm, TeacherStatsCriteriaForm, GroupStatsCriteriaForm
-from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS, stud_filter_data
+from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS, stud_filter_data, \
+    LAB_STATS_SCORE_FIELDS
 from itis_manage.forms import PersonForm, StudentForm, MagistrForm, LaboratoryForm, LabRequestForm
 from itis_manage.lib import get_unique_object_or_none, get_set_sem
 from itis_manage.models import Person, Student, Magistrate, Laboratory, LaboratoryRequest, NGroup, TeacherSubject, \
@@ -242,19 +243,20 @@ class GroupStatsCriteriaView(StatsCriteriaViewBase):
     }  # TODO golden sessions
 
     attrs = {
-        'events':   lambda group: avg([len(stud.events) for stud in group.group_students]),
-        'balls':    lambda group: avg([sum([event.points for event in stud.events]) for stud in group.group_students]),
-        'dopkas':   lambda group: avg([len(stud.dopkas) for stud in group.group_students]),
-        'commissions':  lambda group: avg([len(stud.commissions) for stud in group.group_students]),
+        'events': lambda group: avg([len(stud.events) for stud in group.group_students]),
+        'balls': lambda group: avg([sum([event.points for event in stud.events]) for stud in group.group_students]),
+        'dopkas': lambda group: avg([len(stud.dopkas) for stud in group.group_students]),
+        'commissions': lambda group: avg([len(stud.commissions) for stud in group.group_students]),
         'absences': lambda group: avg([len(stud.attendance) for stud in group.group_students]),
-        'avg_score':    lambda group: avg([avg([p.total() for p in stud.progresses]) for stud in group.group_students]),
-        'fives':    lambda group: avg([sum([p.total() >= MARK_THRESHOLDS[5] for p in stud.progresses]) for stud in group.group_students]),
-        'count':    lambda group: len(group.group_students),
-        'foreigners':   lambda group: sum([stud.city.country != 'Россия' for stud in group.group_students]),
-        'recovered':    lambda group: sum([len(stud.vacations) > 0 for stud in group.group_students]),
-        'dormed':   lambda group: sum([len(stud.dorms) > 0 for stud in group.group_students]),
-        'avg_class_start':  lambda group: avg([cl.lesson.begin.hour*60 + cl.lesson.begin.minute
-                                               for tg in group.teachers for cl in tg.classes])  # TODO convert to time
+        'avg_score': lambda group: avg([avg([p.total() for p in stud.progresses]) for stud in group.group_students]),
+        'fives': lambda group: avg(
+            [sum([p.total() >= MARK_THRESHOLDS[5] for p in stud.progresses]) for stud in group.group_students]),
+        'count': lambda group: len(group.group_students),
+        'foreigners': lambda group: sum([stud.city.country != 'Россия' for stud in group.group_students]),
+        'recovered': lambda group: sum([len(stud.vacations) > 0 for stud in group.group_students]),
+        'dormed': lambda group: sum([len(stud.dorms) > 0 for stud in group.group_students]),
+        'avg_class_start': lambda group: avg([cl.lesson.begin.hour * 60 + cl.lesson.begin.minute
+                                              for tg in group.teachers for cl in tg.classes])  # TODO convert to time
         # TODO golden sessions
     }
 
@@ -275,7 +277,8 @@ class GroupStatsCriteriaView(StatsCriteriaViewBase):
                 setattr(group, attr, f(group))
 
             group.is_bachelor = not group.group_students.filter(magistr_student__isnull=False).exists()
-            group.is_graduated = today().year >= group.year_of_foundation + BACHELOR_YEARS + int(group.is_bachelor)*MASTER_YEARS
+            group.is_graduated = today().year >= group.year_of_foundation + BACHELOR_YEARS + int(
+                group.is_bachelor) * MASTER_YEARS
 
         return groups
 
@@ -389,3 +392,20 @@ def group_rating(request):
                       {'form': form, 'group_rating': group_rating,
                        'group_score_by_subjects': group_score_by_subjects, 'subjects': subjects})
     return render(request, 'itis_data_niffler/templates/group_rating.html', ctx)
+
+
+def lab_rating(request):
+    init = {'base_fields': LAB_STATS_SCORE_FIELDS,
+            'field_order': ('Критерий', 'Отображение')}
+    ctx = {'form': make_form(form_name='form', form_init=init)}
+    if request.method == 'POST':
+        form = ctx['form'](data=request.POST)
+        if form.is_valid():
+            criteria = form.cleaned_data['Критерий']
+            display = form.cleaned_data['Отображение']
+            labs = sorted(Laboratory.objects.all(), key=lambda a: a.show_info(criteria), reverse=True)
+            ctx['labs'] = labs
+            ctx['form'] = form
+            ctx['criteria'] = criteria
+            ctx['display'] = display
+    return render(request, 'itis_data_niffler/templates/lab_rating.html', ctx)

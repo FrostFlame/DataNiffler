@@ -162,10 +162,35 @@ class CourseRequest(models.Model):
 
 class Laboratory(models.Model):
     name = models.CharField(max_length=40, unique=True)
-    person = models.ForeignKey(Person, related_name='person_laboratories')
+    person = models.OneToOneField(Person, related_name='person_laboratory')
+    direction = models.ForeignKey('LaboratoryDirection', related_name='direction_laboratories')
 
     def __str__(self):
         return self.name
+
+    def request_quantity(self):
+        return self.laboratory_requests.count()
+
+    def success_requests_percent(self):
+        if self.laboratory_requests.count() == 0:
+            return 0
+        return round(self.laboratory_requests.filter(is_active=True).count() / self.laboratory_requests.count() * 100,
+                     2)
+
+    def people_quantity(self):
+        return self.laboratory_requests.filter(is_active=True).count()
+
+    def show_info(self, criteria):
+        if criteria == 'rq':
+            return self.request_quantity()
+        elif criteria == 'srp':
+            return self.success_requests_percent()
+        else:
+            return self.people_quantity()
+
+
+class LaboratoryDirection(models.Model):
+    name = models.CharField(max_length=50, null=False)
 
 
 class LaboratoryRequest(models.Model):
