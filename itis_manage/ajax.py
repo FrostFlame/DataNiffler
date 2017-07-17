@@ -1,4 +1,5 @@
 from dal import autocomplete
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
 
@@ -14,7 +15,7 @@ class GetObjects(autocomplete.Select2QuerySetView, CustomLoginRequiredMixin):
 class CuratorAutocompleteView(autocomplete.Select2QuerySetView, CustomLoginRequiredMixin):
     queryset = Person.objects.filter(status__name="Куратор")
 
-
+@login_required()
 def get_subjects(request):
     course = request.GET.get('course_id', None)
     semester = request.GET.get('semester_id', None)

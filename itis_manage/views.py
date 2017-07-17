@@ -2,12 +2,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Q
+from django.forms import formset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect as Redirect
 from django.http import JsonResponse
-from itis_manage.models import Subject, SemesterSubject, Course, Status
-from django.views.generic import CreateView, UpdateView
+
+from itis_data_niffler.lib import make_form
+from itis_manage.fields import ADD_THEME_FORM_FIELDS
+from itis_manage.models import Subject, SemesterSubject, Course, Status, ThemeOfEducation
+from django.views.generic import *
 from itis_manage.models import Laboratory
-from itis_manage.forms import GroupForm, LaboratoryForm, LabRequestForm, TeacherForm
+from itis_manage.forms import GroupForm, LaboratoryForm, LabRequestForm, ThemeOfEducationForm, \
+    TeacherForm
 from itis_manage.models import NGroup, LaboratoryRequest
 from itis_manage.forms import MagistrForm
 from django.shortcuts import render, get_object_or_404
@@ -89,6 +94,54 @@ class EditGroupView(CustomLoginRequiredMixin, UpdateView):
         return reverse_lazy('manage:edit-group', args=(self.object.id,))
 
 
+@login_required(login_url=LOGIN_URL)
+def add_theme_subject(request):
+    ctx = {'form': make_form('form', {'base_fields': ADD_THEME_FORM_FIELDS, 'field_order': ('semester', 'subject')})}
+    ThemeFormSet = formset_factory(ThemeOfEducationForm, extra=1, can_delete=True)
+    if request.method == 'POST':
+        form = ctx['form'](data=request.POST)
+        formset = None
+        kwargs = {}
+        if form.is_valid():
+            kwargs = {'initial': ThemeOfEducation.objects.filter(
+                semester_subject__subject=form.cleaned_data['subject']).values('name', 'id').order_by(
+                'id')}
+            formset = ThemeFormSet(**kwargs)
+            if 'save' in request.POST:
+                kwargs['data'] = request.POST
+                formset = ThemeFormSet(**kwargs)
+                for f in formset:
+                    if f.is_valid():
+                        if 'name' in f.initial:
+                            instance = ThemeOfEducation.objects.get(
+                                semester_subject__subject=form.cleaned_data['subject'], name=f.initial['name'])
+                            data = {}
+                            if 'name' in f.cleaned_data:
+                                fow = ThemeOfEducationForm(data={'name': f.cleaned_data['name']}, instance=instance)
+                            else:
+                                fow = ThemeOfEducationForm(data={'name': f.initial['name']}, instance=instance)
+                            fow.save()
+                        else:
+                            if 'name' in f.cleaned_data:
+                                forw = ThemeOfEducation.objects.create(name=f.cleaned_data['name'],
+                                                                       semester_subject=SemesterSubject.objects.get(
+                                                                           subject=form.cleaned_data['subject']))
+                for f in formset.deleted_forms:
+                    if 'name' in f.cleaned_data:
+                        ThemeOfEducation.objects.filter(
+                            (Q(name=f.cleaned_data['name']) | Q(name=f.cleaned_data['name'])) & Q(
+                                semester_subject__subject=form.cleaned_data['subject'])).delete()
+            kwargs['initial'] = ThemeOfEducation.objects.filter(
+                semester_subject__subject=form.cleaned_data['subject']).values('name', 'id').order_by(
+                'id')
+
+            ctx['formset'] = ThemeFormSet(**kwargs)
+            form.fields['subject'].queryset = Subject.objects.filter(id=form.cleaned_data['subject'].id)
+            ctx['form'] = form
+
+    return render(request, 'templates/add_theme_of_education.html', ctx)
+
+
 @login_required(login_url=reverse_lazy('data:login'))
 def add_subject(request):
     if request.method == 'GET':
@@ -107,8 +160,7 @@ def add_subject(request):
 @login_required(login_url=reverse_lazy('data:login'))
 def add_subject_semesters(request):
     if request.method == 'POST':
-
-        return render(request, 'itis_manage/add_subject2.html', args)
+        return render(request, 'itis_manage/add_subject2.html')
 
 
 def teachers_ajax(request):

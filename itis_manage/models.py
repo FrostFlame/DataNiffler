@@ -358,6 +358,7 @@ class AbsenceEntry(models.Model):
     date = models.DateField('Дата занятия')
 
 
+
 class Dormitory(models.Model):
     name = models.CharField('Название', max_length=50)
     address = models.CharField('Адрес', max_length=200)
@@ -367,3 +368,14 @@ class StudentDormitory(models.Model):
     student = models.ForeignKey(Student, related_name='dorms')
     dormitory = models.ForeignKey(Dormitory, related_name='all_students')
     year = models.PositiveSmallIntegerField('Год')
+
+
+class ThemeOfEducation(models.Model):
+    name = models.CharField('Тема', max_length=100, )
+    semester_subject = models.ForeignKey(SemesterSubject, related_name='themes_of_education')
+
+    class Meta:
+        unique_together = (('name', 'semester_subject'),)
+
+    def __str__(self):
+        return self.name

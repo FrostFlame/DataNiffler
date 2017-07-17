@@ -13,8 +13,8 @@ import datetime
 from django.urls import reverse, reverse_lazy
 
 from itis_data_niffler.lib import set_readable_related_fields
-from itis_manage.models import Student, NGroup, Person, Status, Magistrate, Laboratory, LaboratoryRequest, Subject, \
-    TeacherSubject
+from itis_manage.models import Student, NGroup, Person, Status, Magistrate, Laboratory, LaboratoryRequest, \
+    ThemeOfEducation, SemesterSubject, TeacherSubject
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Field
 from datetimewidget.widgets import DateTimeInput, DateWidget, DateTimeWidget
@@ -147,3 +147,9 @@ class TeacherForm(ReadOnlySupportMixin, forms.ModelForm):
         fields = ('person', 'type',)
         widgets = {
             'person': autocomplete.ModelSelect2(url='manage:ajax-teachers')}
+
+class ThemeOfEducationForm(ReadOnlySupportMixin, forms.ModelForm):
+    class Meta:
+        model = ThemeOfEducation
+        fields = ('name',)
+        widgets = {'name': forms.widgets.TextInput(), }

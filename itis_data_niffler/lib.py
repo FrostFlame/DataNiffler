@@ -98,7 +98,7 @@ def set_readable_related_fields(instance, self, ):
             raise ValidationError(str(self.fields[field].__class__) + ' is not a readable')
 
 
-def make_form(form_name, form_init, form_class=(f.BaseForm,), ctx=None):
+def make_form(form_name, form_init, form_class=(f.BaseForm,), **ctx):
     return type(form_name, form_class, form_init)
 
 

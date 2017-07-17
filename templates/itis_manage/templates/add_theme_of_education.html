@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block title %}
+    Manage Data Niffler - Add Theme of Education
+{% endblock %}
+
+{% block document_ready %}
+    $('.add-item').click(function (ev) {
+    ev.preventDefault();
+    var count = $('#items-form-container').children().length;
+    var tmplMarkup = $('#item-template').html();
+    var compiledTmpl = tmplMarkup.replace(/__prefix__/g, Math.ceil(count/2) );
+    $('div#items-form-container').append(compiledTmpl);
+
+    // update form count
+    $('#id_form-TOTAL_FORMS').attr('value', Math.ceil(count/2 +1));
+
+    // some animate to scroll to view our new form
+    $('html, body').animate({
+    scrollTop: $("#add-item-button").position().top - 200
+    }, 800);
+    document.getElementById("forms").value = Math.ceil(count/2) ;
+
+    });
+{% endblock %}
+
+{% block script %}
+    <script>
+
+        $("#id_semester").change(function () {
+            var semester_id = parseInt($("#id_semester").val());
+            var course = Math.ceil(semester_id / 2);
+            var semester = semester_id % 2;
+            if (semester === 0) {
+                semester = 2;
+            }
+            course = course.toString();
+            semester = semester.toString();
+            $.ajax({
+                url: '{% url "manage:ajax-get-subjects" %}',
+                traditional: true,
+                data: {
+                    'course_id': course,
+                    'semester_id': semester
+                },
+                success: function (response) {
+                    var new_options = response;
+                    $('#id_subject').empty();
+                    $.each(new_options, function (index) {
+                        $('#id_subject')
+                            .append($('<option>', {value: new_options[index].subject__id})
+                                .text(new_options[index].subject__name));
+                    });
+                }
+            });
+        });
+
+    </script>
+{% endblock %}
+
+{% block content %}
+    <script type="text/html" id="item-template">
+        <div id="form-gorup">
+            {{ formset.empty_form }}
+        </div>
+    </script>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form.visible_fields %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field|add_class:'form-control' }}
+                {% for error in field.errors %}
+                    <span class="help-block">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" name="display" class="button alert-danger" value="">Показать</button>
+
+        {{ formset.management_form }}
+        <div id="items-form-container">
+            {% for form in formset %}
+                {% for field in form.visible_fields %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field|add_class:'form-control' }}
+                        {% for error in field.errors %}
+                            <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+                {% for field in form.hidden_fields %}
+                    {{ field|add_class:'form-control' }}
+                {% endfor %}
+            {% endfor %}
+        </div>
+        <a href="#" id="add-item-button" class="btn btn-info add-item">Add Item</a>
+
+        <button type="submit" name="save" class="button alert-danger" value="">Сохранить</button>
+        <input type="hidden" id="forms" name="forms"/>
+    </form>
+
+
+{% endblock %}
