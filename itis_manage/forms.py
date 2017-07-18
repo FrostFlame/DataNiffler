@@ -162,7 +162,7 @@ class ThemeOfEducationForm(ReadOnlySupportMixin, forms.ModelForm):
 class ProgressForm(forms.ModelForm):
     class Meta:
         model = Progress
-        fields = ('semester_subject', 'practice', 'exam')
+        fields = ('practice',)
 
 
 class StudentFormForProgress(forms.ModelForm):
@@ -171,4 +171,18 @@ class StudentFormForProgress(forms.ModelForm):
         fields = ('id',)
 
 
-ProgressFormSet = modelformset_factory(Progress, ProgressForm, extra=0)
+def get_dynamic_formset(model, modelForm, min_number, extra_fields=0, ):
+    return modelformset_factory(model, modelForm, min_num=min_number, max_num=min_number, extra=extra_fields)
+
+
+class MetaProgressPractice:
+    model = Progress
+    fields = ('exam',)
+
+class MetaExamPractice:
+    model = Progress
+    fields = ('practice',)
+
+def get_dynamic_model_form(form, _Meta_=None,):
+    form.Meta = _Meta_
+    return form

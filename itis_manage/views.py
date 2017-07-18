@@ -12,7 +12,7 @@ from itis_manage.models import Subject, SemesterSubject, ThemeOfEducation, Progr
 from django.views.generic import *
 from itis_manage.models import Laboratory
 from itis_manage.forms import GroupForm, LaboratoryForm, LabRequestForm, ThemeOfEducationForm, \
-    TeacherForm, ProgressFormSet
+    TeacherForm, get_dynamic_formset, ProgressForm, get_dynamic_model_form, MetaProgressPractice, MetaExamPractice
 from itis_manage.models import NGroup, LaboratoryRequest
 from itis_manage.forms import MagistrForm
 from django.shortcuts import render, get_object_or_404
@@ -262,16 +262,21 @@ def add_scores(request):
             semester = form.cleaned_data['semester']
             type = form.cleaned_data['type']
             students = Student.objects.filter(group=group,
-                                              progresses__semester_subject__semester=int(semester),
-                                              person__status__name__contains='Студент' if not magister else 'Магистр',
-                                              ).order_by(
-                'person__surname')
-            semester_subjects = SemesterSubject.objects.filter(semester=int(semester), )
-            progresses = Progress.objects.filter(semester_subject__semester=semester, student__in=students).order_by(
+                                              person__status__name__contains='Студент' if not magister else 'Магистр', ). \
+                order_by('person__surname')
+            semester_subjects = SemesterSubject.objects.filter(semester=int(semester)).order_by('subject__name')
+            progresses = Progress.objects.filter(semester_subject__semester=int(semester),
+                                                 student__in=students).order_by(
                 'semester_subject__subject__name')
             ctx['formsformsets'] = {}
+            ctx['semester_subjects'] = semester_subjects
+            model_form = get_dynamic_model_form(ProgressForm,
+                                                MetaProgressPractice) if type == 'ekz' else get_dynamic_model_form(
+                ProgressForm, MetaExamPractice)
             for student in students:
-                ctx['formsformsets'].update({student.id: ProgressFormSet(prefix=student.id, queryset=progresses.filter(
-                    student=student).order_by('semester_subject__subject__name'),)})
+                ctx['formsformsets'].update(
+                    {student.id: get_dynamic_formset(Progress, model_form, semester_subjects.count())(
+                        prefix=student.id, queryset=progresses.filter(
+                            student=student).order_by('semester_subject__subject__name'), )})
             ctx['form'] = form
     return render(request, 'templates/add_score.html', ctx)
