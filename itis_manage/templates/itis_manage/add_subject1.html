@@ -13,6 +13,7 @@
 
 {% block content %}
     <h1>Добавление предмета</h1>
+    <h2>{{ err }}</h2>
     <form method="post" id="post_form">
         {% csrf_token %}
         <label for="name_input">Название предмате</label>
@@ -21,17 +22,19 @@
 
 
         <label for="semesters_select">В каких семестрах преподается?</label>
-        <select class="ultipleSelect" multiple id="semesters_select" name="semesters">
+        <select required class="multipleSelect" multiple id="semesters_select" name="semesters">
             <option value="1">1 бакалавриат</option>
             <option value="2">2 бакалавриат</option>
             <option value="3">3 бакалавриат</option>
             <option value="4">4 бакалавриат</option>
-            <option value="5">1 магистратура</option>
-            <option value="6">2 магистратура</option>
+            <option value="5">(5) 1 магистратура</option>
+            <option value="6">(6) 2 магистратура</option>
+            <option value="7">(7) 3 магистратура</option>
+            <option value="8">(8) 4 магистратура</option>
         </select>
 
         <script>
-            $('.ultipleSelect').fastselect();
+            $('.multipleSelect').fastselect();
         </script>
 
         <button type="submit" value="">Продолжить</button>

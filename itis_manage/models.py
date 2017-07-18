@@ -272,7 +272,6 @@ class TeacherSubject(models.Model):
 
     subject = models.ForeignKey(SemesterSubject, related_name='teachers')
     person = models.ForeignKey(Person, related_name='teacher_subjects')
-    # lesson_count = models.SmallIntegerField('Количество часов')
 
 
 class Program(models.Model):

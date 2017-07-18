@@ -8,7 +8,7 @@ from django.http import JsonResponse
 
 from itis_data_niffler.lib import make_form
 from itis_manage.fields import ADD_THEME_FORM_FIELDS
-from itis_manage.models import Subject, SemesterSubject, Course, Status, ThemeOfEducation
+from itis_manage.models import Subject, SemesterSubject, Course, Status, ThemeOfEducation, TeacherSubject
 from django.views.generic import *
 from itis_manage.models import Laboratory
 from itis_manage.forms import GroupForm, LaboratoryForm, LabRequestForm, ThemeOfEducationForm, \
@@ -144,15 +144,23 @@ def add_theme_subject(request):
 
 @login_required(login_url=reverse_lazy('data:login'))
 def add_subject(request):
+    args = {}
     if request.method == 'GET':
-        return render(request, 'itis_manage/add_subject1.html')
+        return render(request, 'itis_manage/add_subject1.html', args)
     if request.method == 'POST':
         name = request.POST.get('name').title()
-        new_subject = Subject.objects.get_or_create(name=name)
-        args = {}
-        args['semesters'] = list(map(int, request.POST.getlist('semesters')))
+        if Subject.objects.filter(name=name).exists():
+            args['err'] = 'subject_exists'
+            return render(request, 'itis_manage/add_subject1.html', args)
+
         args['name'] = name
+        request.session['name'] = name
+
+        args['semesters'] = list(map(int, request.POST.getlist('semesters')))
+        request.session['semesters'] = args['semesters']
+
         args['teacher_form'] = TeacherForm()
+        args['teachers'] = Person.objects.all().values('id', 'name', 'surname', 'third_name')
 
         return render(request, 'itis_manage/add_subject2.html', args)
 
@@ -160,7 +168,35 @@ def add_subject(request):
 @login_required(login_url=reverse_lazy('data:login'))
 def add_subject_semesters(request):
     if request.method == 'POST':
-        return render(request, 'itis_manage/add_subject2.html')
+        subject = Subject(name=request.session['name'])
+        subject.save()
+
+        semesters = list(map(int, request.session['semesters']))
+        for sem in semesters:
+            add_points = request.POST.get('additional_points' + str(sem))
+            if add_points == 'on':
+                add_points = True
+            else:
+                add_points = False
+
+            exam = request.POST.get('exam' + str(sem))
+            sem_subj = SemesterSubject(semester=sem, subject=subject, additional_points=add_points, type_of_exam=exam)
+            sem_subj.save()
+
+            teachers = list(map(int, request.POST.getlist('teacher' + str(sem))))
+            for t in teachers:
+                teacher = Person.objects.get(id=t)
+                teacher_type = request.POST.get('type' + str(sem) + '_' + str(t))
+                if teacher_type == 'LP':
+                    teacher_subject1 = TeacherSubject(subject=sem_subj, person=teacher, type='L')
+                    teacher_subject2 = TeacherSubject(subject=sem_subj, person=teacher, type='P')
+                    teacher_subject1.save()
+                    teacher_subject2.save()
+                else:
+                    teacher_subject = TeacherSubject(subject=sem_subj, person=teacher, type=teacher_type)
+                    teacher_subject.save()
+
+        return render(request, 'itis_manage/add_subject1.html')
 
 
 def teachers_ajax(request):

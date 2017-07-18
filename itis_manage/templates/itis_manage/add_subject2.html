@@ -13,16 +13,88 @@
 
 {% block content %}
     <h1>Добавление предмета {{ name }}</h1>
-    <form method="post" id="post_form">
+    <form method="post" id="post_form" action="{% url 'manage:create-subject-semesters' %}">
         {% csrf_token %}
 
         {% for sem in semesters %}
-            <p>Семестр {{ sem }}</p>
-            {{ teacher_form }}
-            <br>
+            <div id="sem{{ sem }}">
+                <h3>Семестр {{ sem }}</h3>
+                <label for="">Преподаватель</label>
+                <select required class="multipleSelect" multiple name="teacher{{ sem }}" id="teacher{{ sem }}">
+                    {% for t in teachers %}
+                        <option value="{{ t.id }}">{{ t.surname }} {{ t.name }} {{ t.third_name }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label for="">Разрешены доп. баллы?</label>
+                <input type="checkbox" name="additional_points{{ sem }}" id="">
+                <br>
+                <label>Тип экзамена</label>
+                <select required name="exam{{ sem }}">
+                    <option value=EX selected>Экзамен</option>
+                    <option value=ND>Недиф. зачет</option>
+                    <option value=DT>Диф. зачет</option>
+                </select>
+                <br>
+                <div id="toAppend{{ sem }}"></div>
+            </div>
         {% endfor %}
 
         <br>
-        <button type="submit" value="">Продолжить</button>
+        <div id="continue">Продолжить</div>
+        <button type="submit" id="submit" hidden>Продолжить</button>
     </form>
+
+    <script>
+
+        $('#continue').click(function () {
+            if ($('#continue').is(":not(':hidden')")) {
+                $('#continue').hide();
+                $('#submit').show();
+            }
+        });
+
+        $('.multipleSelect').change(function () {
+            $('#continue').show();
+            $('#submit').hide();
+        });
+
+
+        $('.multipleSelect').fastselect();
+
+        {% for sem in semesters %}
+            $('#continue').click(function () {
+                $('#toAppend{{ sem }}').empty();
+
+                var teachers = $("#teacher{{ sem }}").val();
+                var names = [];
+
+                $("#teacher{{ sem }} :selected").each(function (i, sel) {
+                    names[i] = $(sel).text();
+                });
+
+
+                teachers.forEach(function (item, i, arr) {
+
+                    var label = $('<label></label').text(names[i]);
+
+                    var type_select = $('<select required></select>').attr('id', 'type{{ sem }}_' + item).attr('name', 'type{{ sem }}_' + item);
+                    type_select.append($('<option disable select value style="display:none">Выберите тип</option>'));
+                    type_select.append($('<option value=L>Лекция</option>'));
+                    type_select.append($('<option value=P>Практика</option>'));
+                    type_select.append($('<option value=LP>Лекция и практика</option>'));
+
+
+                    $('#toAppend{{ sem }}').append(label);
+                    $('#toAppend{{ sem }}').append($('<br>'));
+                    $('#toAppend{{ sem }}').append(type_select);
+                    $('#toAppend{{ sem }}').append($('<br>'));
+
+                })
+            });
+
+        {% endfor %}
+
+
+    </script>
 {% endblock %}
