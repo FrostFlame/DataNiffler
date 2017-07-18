@@ -268,9 +268,10 @@ def add_scores(request):
                 'person__surname')
             semester_subjects = SemesterSubject.objects.filter(semester=int(semester), )
             progresses = Progress.objects.filter(semester_subject__semester=semester, student__in=students).order_by(
-                'students__person__surname')
+                'semester_subject__subject__name')
             ctx['formsformsets'] = {}
             for student in students:
-                ctx['formsformsets'].update({student.id: ProgressFormSet(prefix=student.id)})
+                ctx['formsformsets'].update({student.id: ProgressFormSet(prefix=student.id, queryset=progresses.filter(
+                    student=student).order_by('semester_subject__subject__name'),)})
             ctx['form'] = form
     return render(request, 'templates/add_score.html', ctx)

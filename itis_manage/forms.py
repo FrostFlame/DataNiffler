@@ -171,4 +171,4 @@ class StudentFormForProgress(forms.ModelForm):
         fields = ('id',)
 
 
-ProgressFormSet = modelformset_factory(Progress, ProgressForm, extra=3)
+ProgressFormSet = modelformset_factory(Progress, ProgressForm, extra=0)
