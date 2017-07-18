@@ -26,7 +26,7 @@ forms.ModelChoiceField.widget = autocomplete.ModelSelect2
 
 
 class SimpleForm(forms.Form):
-    username = forms.CharField(label="Username", required=True)
+    username = forms.CharField(label="Username", required=True,)
     password = forms.CharField(
         label="Password", required=True, widget=forms.PasswordInput)
     remember = forms.BooleanField(label="Remember Me?")
@@ -162,7 +162,9 @@ class ThemeOfEducationForm(ReadOnlySupportMixin, forms.ModelForm):
 class ProgressForm(forms.ModelForm):
     class Meta:
         model = Progress
-        fields = ('practice',)
+        fields = ('practice', 'id', 'semester_subject')
+
+    semester_subject = forms.ModelChoiceField(required=False, queryset=SemesterSubject.objects.all(), widget=forms.HiddenInput())
 
 
 class StudentFormForProgress(forms.ModelForm):
@@ -177,12 +179,20 @@ def get_dynamic_formset(model, modelForm, min_number, extra_fields=0, ):
 
 class MetaProgressPractice:
     model = Progress
-    fields = ('exam',)
+    fields = ('exam', 'id', 'semester_subject')
+    widgets = {
+        'semester_subject': forms.HiddenInput()
+    }
+
 
 class MetaExamPractice:
     model = Progress
-    fields = ('practice',)
+    fields = ('practice', 'id', 'semester_subject')
+    widgets = {
+        'semester_subject': forms.HiddenInput()
+    }
 
-def get_dynamic_model_form(form, _Meta_=None,):
+
+def get_dynamic_model_form(form, _Meta_=None, ):
     form.Meta = _Meta_
     return form

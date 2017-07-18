@@ -246,8 +246,8 @@ class SemesterSubject(models.Model):
 class Progress(models.Model):
     semester_subject = models.ForeignKey(SemesterSubject, related_name='semester_subject_progresses')
     student = models.ForeignKey(Student, related_name='progresses')
-    practice = models.IntegerField()
-    exam = models.IntegerField()
+    practice = models.IntegerField(default=0, )
+    exam = models.IntegerField(default=0, )
 
     class Meta:
         unique_together = (('semester_subject', 'student'),)
@@ -355,7 +355,6 @@ class AbsenceEntry(models.Model):
     _class = models.ForeignKey(TimetableClass, related_name='attendance')
     student = models.ForeignKey(Student, related_name='attendance')
     date = models.DateField('Дата занятия')
-
 
 
 class Dormitory(models.Model):

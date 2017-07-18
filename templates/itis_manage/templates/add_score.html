@@ -5,8 +5,7 @@
     Data Niffler - Add student
 {% endblock %}
 
-{% block script %}
-{% endblock %}
+
 
 {% block content %}
     {% if messages %}
@@ -28,7 +27,7 @@
             </div>
         {% endfor %}
         {% if not read %}
-            <button type="submit" value="">Get</button>
+            <button type="submit" value="">Filter</button>
         {% endif %}
 
 
@@ -62,12 +61,15 @@
                         <tr>
                             <td class="hidden-xs">{% return_model_object_field model='Student' id=formset field='person' %}</td>
                             {% get_attr formsformsets formset as formset1 %}
+                            {{ formset1.management_form }}
                             {% for form in formset1 %}
                                 <td>
                                     {% for field in form.visible_fields %}
                                         {{ field|add_class:'form-control' }}
                                     {% endfor %}
                                 </td>
+                                {{ form.id.as_hidden }}
+                                {{ form.semester_subject.as_hidden }}
                             {% endfor %}
 
                         </tr>
@@ -75,27 +77,11 @@
 
                     </tbody>
                 </table>
+                {% if not read %}
+                    <button type="submit" name="save" value="">Save</button>
+                {% endif %}
+            </div>
 
-            </div>
-            <div class="panel-footer">
-                <div class="row">
-                    <div class="col col-xs-4">Page 1 of 5
-                    </div>
-                    <div class="col col-xs-8">
-                        <ul class="pagination hidden-xs pull-right">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li><a href="#">4</a></li>
-                            <li><a href="#">5</a></li>
-                        </ul>
-                        <ul class="pagination visible-xs pull-right">
-                            <li><a href="#">«</a></li>
-                            <li><a href="#">»</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </form>
