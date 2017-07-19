@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% block title %}
-    Data Niffler - Add student
+    Добавление человека
 {% endblock %}
 
-{% block script %}
-{% endblock %}
 
 {% block content %}
+    <!-- Page Heading -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Добавление человека
+            </h1>
+        </div>
+    </div>
+    <!-- /.row -->
+
+
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -15,29 +24,85 @@
             {% endfor %}
         </ul>
     {% endif %}
-    <form method="post" class="form form-horizontal">
-        {% csrf_token %}
-        {% for field in person_form.visible_fields %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field|add_class:'form-control' }}
-                {% for error in field.errors %}
-                    <span class="help-block">{{ error }}</span>
-                {% endfor %}
+    <div class="row">
+        <form method="post">
+            <div class="col-lg-6">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Информация о человеке</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% csrf_token %}
+                        {% for field in person_form.visible_fields %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field|add_class:'form-control' }}
+                                {% for error in field.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-        <details>
-            <summary>Форма студента</summary>
-            {{ student_form.as_p }}
-        </details>
-        <details>
-            <summary>Форма магистра</summary>
-            {{ magistr_form.as_p }}
-        </details>
-        <input type="hidden" id="hidden_student_form" name="student_filled" value="False"/>
-        {% if not read %}
-            <button type="submit" value="">Send</button>
-        {% endif %}
-    </form>
+            <div class="col-lg-6">
+                <div class="panel panel-info" id="student_form" hidden>
+                    <div class="panel-body">
+                        {% for field in student_form.visible_fields %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field|add_class:'form-control' }}
+                                {% for error in field.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="panel panel-info" id="magistr_form" hidden>
+                    <div class="panel-body">
+                        {% for field in magistr_form.visible_fields %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field|add_class:'form-control' }}
+                                {% for error in field.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <input type="hidden" id="hidden_student_form" name="student_filled" value="False"/>
+                {% if not read %}
+                    <button class="btn btn-primary btn-cons" type="submit">Send</button>
+                {% endif %}
+            </div>
+        </form>
+
+    </div>
+
+    <script>
+        $('#id_status').change(function () {
+            $('#student_form').hide();
+            $('#magistr_form').hide();
+            var selected = $('#id_status').val();
+            selected.forEach(function (item, i, arr) {
+                /*
+                 ATTENTION!
+                 ID = 1 - Студент (Бакалавриат)
+                 ID = 2 - Магистрант
+                 */
+                if (item == 1) {
+                    $('#student_form').show();
+                }
+                if (item == 2) {
+                    $('#magistr_form').show();
+                }
+            });
+
+        })
+    </script>
 
 {% endblock %}
