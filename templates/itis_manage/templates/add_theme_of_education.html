@@ -95,29 +95,30 @@
             </div>
         {% endfor %}
         <button type="submit" name="display" class="button alert-danger" value="">Показать</button>
+        {% if formset %}
+            {{ formset.management_form }}
+            <div id="items-form-container">
+                {% for form in formset %}
+                    {% for field in form.visible_fields %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field|add_class:'form-control' }}
+                            {% for error in field.errors %}
+                                <span class="help-block">{{ error }}</span>
+                            {% endfor %}
 
-        {{ formset.management_form }}
-        <div id="items-form-container">
-            {% for form in formset %}
-                {% for field in form.visible_fields %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        </div>
+                    {% endfor %}
+                    {% for field in form.hidden_fields %}
                         {{ field|add_class:'form-control' }}
-                        {% for error in field.errors %}
-                            <span class="help-block">{{ error }}</span>
-                        {% endfor %}
-
-                    </div>
+                    {% endfor %}
                 {% endfor %}
-                {% for field in form.hidden_fields %}
-                    {{ field|add_class:'form-control' }}
-                {% endfor %}
-            {% endfor %}
-        </div>
-        <a href="#" id="add-item-button" class="btn btn-info add-item">Add Item</a>
+            </div>
+            <a href="#" id="add-item-button" class="btn btn-info add-item">Add Item</a>
 
-        <button type="submit" name="save" class="button alert-danger" value="">Сохранить</button>
-        <input type="hidden" id="forms" name="forms"/>
+            <button type="submit" name="save" class="button alert-danger" value="">Сохранить</button>
+            <input type="hidden" id="forms" name="forms"/>
+        {% endif %}
     </form>
 
 
