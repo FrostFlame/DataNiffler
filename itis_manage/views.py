@@ -112,31 +112,37 @@ def add_theme_subject(request):
             if 'save' in request.POST:
                 kwargs['data'] = request.POST
                 formset = ThemeFormSet(**kwargs)
-                for f in formset:
-                    if f.is_valid():
-                        if 'name' in f.initial:
-                            instance = ThemeOfEducation.objects.get(
-                                semester_subject__subject=form.cleaned_data['subject'],
-                                semester_subject__semester=semester, name=f.initial['name'])
-                            data = {}
-                            if 'name' in f.cleaned_data:
-                                fow = ThemeOfEducationForm(data={'name': f.cleaned_data['name']}, instance=instance)
+                try:
+                    for f in formset:
+                        if f.is_valid():
+                            if 'name' in f.initial:
+                                instance = ThemeOfEducation.objects.get(
+                                    semester_subject__subject=form.cleaned_data['subject'],
+                                    semester_subject__semester=semester, name=f.initial['name'])
+                                instance = None
+                                if instance is not None:
+                                    data = {}
+                                    if 'name' in f.cleaned_data:
+                                        fow = ThemeOfEducationForm(data={'name': f.cleaned_data['name']},
+                                                                   instance=instance)
+                                    else:
+                                        fow = ThemeOfEducationForm(data={'name': f.initial['name']}, instance=instance)
+                                    fow.save()
                             else:
-                                fow = ThemeOfEducationForm(data={'name': f.initial['name']}, instance=instance)
-                            fow.save()
-                        else:
-                            if 'name' in f.cleaned_data:
-                                forw = ThemeOfEducation.objects.create(name=f.cleaned_data['name'],
-                                                                       semester_subject=SemesterSubject.objects.get(
-                                                                           subject=form.cleaned_data['subject'],
-                                                                           semester=semester,
-                                                                       ), )
-                for f in formset.deleted_forms:
-                    if 'name' in f.cleaned_data:
-                        ThemeOfEducation.objects.filter(
-                            (Q(name=f.cleaned_data['name']) | Q(name=f.cleaned_data['name'])) & Q(
-                                semester_subject__subject=form.cleaned_data['subject']) & Q(
-                                semester_subject__semester=semester)).delete()
+                                if 'name' in f.cleaned_data:
+                                    forw = ThemeOfEducation.objects.create(name=f.cleaned_data['name'],
+                                                                           semester_subject=SemesterSubject.objects.get(
+                                                                               subject=form.cleaned_data['subject'],
+                                                                               semester=semester,
+                                                                           ), )
+                    for f in formset.deleted_forms:
+                        if 'name' in f.cleaned_data:
+                            ThemeOfEducation.objects.filter(
+                                (Q(name=f.cleaned_data['name']) | Q(name=f.cleaned_data['name'])) & Q(
+                                    semester_subject__subject=form.cleaned_data['subject']) & Q(
+                                    semester_subject__semester=semester)).delete()
+                except Exception:
+                    print(Exception)
             kwargs['initial'] = ThemeOfEducation.objects.filter(
                 semester_subject__subject=form.cleaned_data['subject'], semester_subject__semester=semester).values(
                 'name', 'id').order_by(
@@ -284,25 +290,27 @@ def add_scores(request):
             ctx['formsformsets'] = {}
 
             ctx['semester_subjects'] = semester_subjects
-
-            for student in students:
-                if 'save' in request.POST:
-                    ctx['formsformsets'].update(
-                        {student.id: get_dynamic_formset(Progress, model_form, semester_subjects.count())(
-                            prefix=student.id, queryset=progresses.filter(
-                                student=student, ).order_by('semester_subject__subject__name'), data=request.POST)})
-                    if ctx['formsformsets'][student.id].is_valid():
-                        instances = ctx['formsformsets'][student.id]
-                        i = 0
-                        for instance in instances:
-                            instance.instance.student = student
-                            instance.instance.semester_subject = semester_subjects[i]
-                            instance.save()
-                            i += 1
-                else:
-                    ctx['formsformsets'].update(
-                        {student.id: get_dynamic_formset(Progress, model_form, semester_subjects.count())(
-                            prefix=student.id, queryset=progresses.filter(
-                                student=student).order_by('semester_subject__subject__name'), )})
+            try:
+                for student in students:
+                    if 'save' in request.POST:
+                        ctx['formsformsets'].update(
+                            {student.id: get_dynamic_formset(Progress, model_form, semester_subjects.count())(
+                                prefix=student.id, queryset=progresses.filter(
+                                    student=student, ).order_by('semester_subject__subject__name'), data=request.POST)})
+                        if ctx['formsformsets'][student.id].is_valid():
+                            instances = ctx['formsformsets'][student.id]
+                            i = 0
+                            for instance in instances:
+                                instance.instance.student = student
+                                instance.instance.semester_subject = semester_subjects[i]
+                                instance.save()
+                                i += 1
+                    else:
+                        ctx['formsformsets'].update(
+                            {student.id: get_dynamic_formset(Progress, model_form, semester_subjects.count())(
+                                prefix=student.id, queryset=progresses.filter(
+                                    student=student).order_by('semester_subject__subject__name'), )})
+            except Exception:
+                print(Exception)
             ctx['form'] = form
     return render(request, 'templates/add_score.html', ctx)
