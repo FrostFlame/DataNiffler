@@ -6,3 +6,15 @@
     border: none;
     overflow: hidden;
 }
+
+.error {
+    color: #c70500;
+}
+
+.center {
+    text-align: center;
+}
+
+.grey {
+    color: #505052;
+}

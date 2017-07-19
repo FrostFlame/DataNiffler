@@ -1,14 +1,3 @@
-{#<button type="button" id="feedback-btn" class="btn btn-info vertical-right-aligned">#}
-{#    Feedback <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span>#}
-{#</button>#}
-
-
-{#{% block footer %}#}
-{#    {% include 'tellme.html' %}#}
-{#{% endblock %}#}
-
-
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -125,21 +114,17 @@
                 <li {% if request.resolver_match.url_name == 'edit-add-delete-person' %}class="active"{% endif %}>
                     <a href="/manage/person/add"><i class="fa fa-fw fa-user"></i> Человек</a>
                 </li>
-                <li>
-                    <a href="bootstrap-elements.html"><i class="fa fa-fw fa-flask"></i> Лаборатория</a>
+                <li {% if request.resolver_match.url_name == 'add-edit-delete-lab' %}class="active"{% endif %}>
+                    <a href="/manage/lab/add"><i class="fa fa-fw fa-flask"></i> Лаборатория</a>
                 </li>
-                <li>
-                    <a href="bootstrap-grid.html"><i class="fa fa-fw fa-bell"></i> Заявки</a>
-                </li>
-                <li>
-                    <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i
-                            class="fa fa-fw fa-arrows-v"></i> Dropdown <i class="fa fa-fw fa-caret-down"></i></a>
+                <li {% if request.resolver_match.url_name == 'lab-request-add-edit-delete' or request.resolver_match.url_name == 'lab-requests' %}class="active"{% endif %}>
+                    <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-bell"></i> Заявки <i class="fa fa-fw fa-caret-down"></i></a>
                     <ul id="demo" class="collapse">
                         <li>
-                            <a href="#">Dropdown Item</a>
+                            <a href="/manage/request/lab/add">Добавить заявку</a>
                         </li>
                         <li>
-                            <a href="#">Dropdown Item</a>
+                            <a href="/manage/request/labs">Список заявок</a>
                         </li>
                     </ul>
                 </li>
@@ -158,7 +143,9 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Заголовок страницы
+                            {% block page_title %}
+                                Заголовок страницы
+                            {% endblock %}
                         </h1>
                     </div>
                 </div>

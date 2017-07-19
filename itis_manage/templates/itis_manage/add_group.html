@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
 
+{% block page_title %}
+        Добавление группы
+    {% endblock %}
+
 {% block title %}
     Data Niffler - Add group
 {% endblock %}
 
 {% block content %}
+
     <form method="post">
         {% csrf_token %}
         {{ group_form.as_p }}

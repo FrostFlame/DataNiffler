@@ -5,6 +5,15 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Page Heading -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Добавление предмета
+            </h1>
+        </div>
+    </div>
+    <!-- /.row -->
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -12,19 +21,31 @@
             {% endfor %}
         </ul>
     {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        {% for field in lab_form.visible_fields %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field|add_class:'form-control' }}
-                {% for error in field.errors %}
-                    <span class="help-block">{{ error }}</span>
-                {% endfor %}
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Информация о заявке</h3>
+                </div>
+                <div class="panel-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in lab_form.visible_fields %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field|add_class:'form-control' }}
+                                {% for error in field.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        {% if not read %}
+                            <button type="submit" class="btn btn-primary" value="">Добавить</button>
+                        {% endif %}
+                    </form>
+                </div>
             </div>
-        {% endfor %}
-        {% if not read %}
-            <button type="submit" value="">Send</button>
-        {% endif %}
-    </form>
+        </div>
+    </div>
 {% endblock %}

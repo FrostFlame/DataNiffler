@@ -150,7 +150,7 @@ def add_subject(request):
     if request.method == 'POST':
         name = request.POST.get('name').title()
         if Subject.objects.filter(name=name).exists():
-            args['err'] = 'subject_exists'
+            args['err'] = 'Предмет уже существует'
             return render(request, 'itis_manage/add_subject1.html', args)
 
         args['name'] = name

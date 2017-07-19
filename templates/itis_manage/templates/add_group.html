@@ -1,11 +1,29 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% block title %}
-    Data Niffler - Add group
+    Добавить группу
 {% endblock %}
 
 {% block content %}
-    <form method="post" class="form form-horizontal">
-        {% include 'form_contents.html' %}
-    </form>
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Добавление группы
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Информация об академической группе</h3>
+                </div>
+                <div class="panel-body">
+                    <form method="post">
+                        {% include 'form_contents.html' %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

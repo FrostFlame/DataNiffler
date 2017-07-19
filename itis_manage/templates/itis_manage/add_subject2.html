@@ -7,43 +7,76 @@
 
 {% block extrahead %}
     <link href="/static/css/fastselect.min.css" type="text/css" media="all" rel="stylesheet"/>
+    {#    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">#}
     <script type="text/javascript" src="/static/js/fastselect.min.js"></script>
     <script type="text/javascript" src="/static/js/fastselect.standalone.min.js"></script>
 {% endblock %}
 
 {% block content %}
-    <h1>Добавление предмета {{ name }}</h1>
-    <form method="post" id="post_form" action="{% url 'manage:create-subject-semesters' %}">
-        {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Добавление предмета {{ name }}
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Допонительная информация о предмете</h3>
+                </div>
+                <div class="panel-body">
+                    <form method="post" id="post_form" action="{% url 'manage:create-subject-semesters' %}">
+                        {% csrf_token %}
 
-        {% for sem in semesters %}
-            <div id="sem{{ sem }}">
-                <h3>Семестр {{ sem }}</h3>
-                <label for="">Преподаватель</label>
-                <select required class="multipleSelect" multiple name="teacher{{ sem }}" id="teacher{{ sem }}">
-                    {% for t in teachers %}
-                        <option value="{{ t.id }}">{{ t.surname }} {{ t.name }} {{ t.third_name }}</option>
-                    {% endfor %}
-                </select>
-                <br>
-                <label for="">Разрешены доп. баллы?</label>
-                <input type="checkbox" name="additional_points{{ sem }}" id="">
-                <br>
-                <label>Тип экзамена</label>
-                <select required name="exam{{ sem }}">
-                    <option value=EX selected>Экзамен</option>
-                    <option value=ND>Недиф. зачет</option>
-                    <option value=DT>Диф. зачет</option>
-                </select>
-                <br>
-                <div id="toAppend{{ sem }}"></div>
+                        {% for sem in semesters %}
+                            <div id="sem{{ sem }}">
+                                <h3 class="grey">Семестр {{ sem }}</h3>
+
+                                <div class="form-group">
+                                    <label for="teacher{{ sem }}">Преподаватель</label>
+                                    <br>
+                                    <select required class="multipleSelect form-control" multiple
+                                            name="teacher{{ sem }}"
+                                            id="teacher{{ sem }}">
+                                        {% for t in teachers %}
+                                            <option value="{{ t.id }}">{{ t.surname }} {{ t.name }} {{ t.third_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <br>
+
+                                <div class="form-group">
+                                    <label for="additional_points{{ sem }}">Разрешены доп. баллы?</label>
+                                    <input type="checkbox" id="additional_points{{ sem }}"
+                                           name="additional_points{{ sem }}" class="">
+                                </div>
+                                <br>
+                                <div class="form-group">
+                                    <label>Тип экзамена</label>
+                                    <select class="form-control" required name="exam{{ sem }}">
+                                        <option value=EX selected>Экзамен</option>
+                                        <option value=ND>Недиф. зачет</option>
+                                        <option value=DT>Диф. зачет</option>
+                                    </select>
+                                </div>
+                                <br>
+                                <div id="toAppend{{ sem }}"></div>
+                            </div>
+                            <hr>
+                        {% endfor %}
+
+                        <br>
+                        <div id="continue" class="btn btn-primary">Продолжить</div>
+                        <button style="display: none;" class="btn btn-success" type="submit" id="submit">Сохранить
+                        </button>
+                    </form>
+
+                </div>
             </div>
-        {% endfor %}
-
-        <br>
-        <div id="continue">Продолжить</div>
-        <button type="submit" id="submit" hidden>Продолжить</button>
-    </form>
+        </div>
+    </div>
 
     <script>
 
@@ -78,7 +111,7 @@
 
                     var label = $('<label></label').text(names[i]);
 
-                    var type_select = $('<select required></select>').attr('id', 'type{{ sem }}_' + item).attr('name', 'type{{ sem }}_' + item);
+                    var type_select = $('<select required></select>').attr('id', 'type{{ sem }}_' + item).attr('name', 'type{{ sem }}_' + item).attr('class', 'form-control');
                     type_select.append($('<option disable select value style="display:none">Выберите тип</option>'));
                     type_select.append($('<option value=L>Лекция</option>'));
                     type_select.append($('<option value=P>Практика</option>'));

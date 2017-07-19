@@ -1,4 +1,5 @@
 {% load widget_tweaks %}
+
 {% csrf_token %}
 {% for field in form.visible_fields %}
     <div class="form-group">
@@ -10,8 +11,7 @@
     </div>
 {% endfor %}
 {% if not form.readonly %}
-    <div class="form-group">
-        <!-- TODO move that to the calling template? -->
-        <input type="submit" class="btn btn-primary" value="Send">
-    </div>
+    <!-- TODO move that to the calling template? -->
+    <input type="submit" class="btn btn-primary" value="Send">
 {% endif %}
+
