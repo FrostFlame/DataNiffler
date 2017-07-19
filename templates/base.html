@@ -1,3 +1,13 @@
+{#<button type="button" id="feedback-btn" class="btn btn-info vertical-right-aligned">#}
+{#    Feedback <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span>#}
+{#</button>#}
+
+
+{#{% block footer %}#}
+{#    {% include 'tellme.html' %}#}
+{#{% endblock %}#}
+
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -56,7 +66,20 @@
 
     {% endblock %}
 
+    <script type="text/javascript">
+        $(document).ready(function () {
+            {% block document_ready %}
+            {% endblock %}
+        });
+    </script>
 
+
+    <script type="application/javascript">
+        $(function () {
+            {% block jquery %}
+            {% endblock %}
+        });
+    </script>
 </head>
 
 <body>
@@ -118,7 +141,8 @@
                     <a href="/manage/lab/add"><i class="fa fa-fw fa-flask"></i> Лаборатория</a>
                 </li>
                 <li {% if request.resolver_match.url_name == 'lab-request-add-edit-delete' or request.resolver_match.url_name == 'lab-requests' %}class="active"{% endif %}>
-                    <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-bell"></i> Заявки <i class="fa fa-fw fa-caret-down"></i></a>
+                    <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-bell"></i>
+                        Заявки <i class="fa fa-fw fa-caret-down"></i></a>
                     <ul id="demo" class="collapse">
                         <li>
                             <a href="/manage/request/lab/add">Добавить заявку</a>
@@ -159,7 +183,10 @@
 
 </div>
 <!-- /#wrapper -->
-
 </body>
 
+{% block script %}
+    <script type="application/javascript">
+    </script>
+{% endblock %}
 </html>

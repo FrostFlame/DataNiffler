@@ -5,7 +5,7 @@ from django import forms
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db.models import Model
+from django.db.models import Model, Q
 from django.forms import widgets, inlineformset_factory, ModelChoiceField, ModelMultipleChoiceField, \
     modelformset_factory
 from django.shortcuts import get_object_or_404
@@ -26,7 +26,7 @@ forms.ModelChoiceField.widget = autocomplete.ModelSelect2
 
 
 class SimpleForm(forms.Form):
-    username = forms.CharField(label="Username", required=True,)
+    username = forms.CharField(label="Username", required=True, )
     password = forms.CharField(
         label="Password", required=True, widget=forms.PasswordInput)
     remember = forms.BooleanField(label="Remember Me?")
@@ -164,7 +164,8 @@ class ProgressForm(forms.ModelForm):
         model = Progress
         fields = ('practice', 'id', 'semester_subject')
 
-    semester_subject = forms.ModelChoiceField(required=False, queryset=SemesterSubject.objects.all(), widget=forms.HiddenInput())
+    semester_subject = forms.ModelChoiceField(required=False, queryset=SemesterSubject.objects.all(),
+                                              widget=forms.HiddenInput())
 
 
 class StudentFormForProgress(forms.ModelForm):

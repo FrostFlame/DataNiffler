@@ -103,8 +103,10 @@ def add_theme_subject(request):
         formset = None
         kwargs = {}
         if form.is_valid():
+            semester = int(form.cleaned_data['semester'])
             kwargs = {'initial': ThemeOfEducation.objects.filter(
-                semester_subject__subject=form.cleaned_data['subject']).values('name', 'id').order_by(
+                semester_subject__subject=form.cleaned_data['subject'],
+                semester_subject__semester=semester).values('name', 'id').order_by(
                 'id')}
             formset = ThemeFormSet(**kwargs)
             if 'save' in request.POST:
@@ -114,7 +116,8 @@ def add_theme_subject(request):
                     if f.is_valid():
                         if 'name' in f.initial:
                             instance = ThemeOfEducation.objects.get(
-                                semester_subject__subject=form.cleaned_data['subject'], name=f.initial['name'])
+                                semester_subject__subject=form.cleaned_data['subject'],
+                                semester_subject__semester=semester, name=f.initial['name'])
                             data = {}
                             if 'name' in f.cleaned_data:
                                 fow = ThemeOfEducationForm(data={'name': f.cleaned_data['name']}, instance=instance)
@@ -125,14 +128,18 @@ def add_theme_subject(request):
                             if 'name' in f.cleaned_data:
                                 forw = ThemeOfEducation.objects.create(name=f.cleaned_data['name'],
                                                                        semester_subject=SemesterSubject.objects.get(
-                                                                           subject=form.cleaned_data['subject']))
+                                                                           subject=form.cleaned_data['subject'],
+                                                                           semester=semester,
+                                                                       ), )
                 for f in formset.deleted_forms:
                     if 'name' in f.cleaned_data:
                         ThemeOfEducation.objects.filter(
                             (Q(name=f.cleaned_data['name']) | Q(name=f.cleaned_data['name'])) & Q(
-                                semester_subject__subject=form.cleaned_data['subject'])).delete()
+                                semester_subject__subject=form.cleaned_data['subject']) & Q(
+                                semester_subject__semester=semester)).delete()
             kwargs['initial'] = ThemeOfEducation.objects.filter(
-                semester_subject__subject=form.cleaned_data['subject']).values('name', 'id').order_by(
+                semester_subject__subject=form.cleaned_data['subject'], semester_subject__semester=semester).values(
+                'name', 'id').order_by(
                 'id')
 
             ctx['formset'] = ThemeFormSet(**kwargs)
@@ -289,7 +296,7 @@ def add_scores(request):
                         i = 0
                         for instance in instances:
                             instance.instance.student = student
-                            instance.instance.semester_subject= semester_subjects[i]
+                            instance.instance.semester_subject = semester_subjects[i]
                             instance.save()
                             i += 1
                 else:
