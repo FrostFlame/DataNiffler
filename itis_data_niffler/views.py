@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 from functools import reduce
 
 from django.contrib import messages
@@ -242,8 +242,14 @@ class GroupStatsCriteriaView(StatsCriteriaViewBase):
         'Выпустилась?': 'is_graduated'
     }  # TODO golden sessions
 
+    @staticmethod
+    def avg_class_start(group):
+        times = [cl.lesson.begin.hour * 60 + cl.lesson.begin.minute for tg in group.teachers for cl in tg.classes]
+        avg_minutes =avg(times)
+        return time(avg_minutes // 60, avg_minutes % 60)
+
     attrs = {
-        'events': lambda group: avg([len(stud.events) for stud in group.group_students]),
+        'events': lambda group: avg([len(stud.person.events) for stud in group.group_students]),
         'balls': lambda group: avg([sum([event.points for event in stud.events]) for stud in group.group_students]),
         'dopkas': lambda group: avg([len(stud.dopkas) for stud in group.group_students]),
         'commissions': lambda group: avg([len(stud.commissions) for stud in group.group_students]),
@@ -255,8 +261,7 @@ class GroupStatsCriteriaView(StatsCriteriaViewBase):
         'foreigners': lambda group: sum([stud.city.country != 'Россия' for stud in group.group_students]),
         'recovered': lambda group: sum([len(stud.vacations) > 0 for stud in group.group_students]),
         'dormed': lambda group: sum([len(stud.dorms) > 0 for stud in group.group_students]),
-        'avg_class_start': lambda group: avg([cl.lesson.begin.hour * 60 + cl.lesson.begin.minute
-                                              for tg in group.teachers for cl in tg.classes])  # TODO convert to time
+        'avg_class_start': lambda group: GroupStatsCriteriaView.avg_class_start(group),
         # TODO golden sessions
     }
 

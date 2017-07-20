@@ -106,7 +106,7 @@ def make_form(form_name, form_init, form_class=(f.BaseForm,), **ctx):
 
 
 def stud_filter_data(stud, semester, year_start, year_end):
-    stud.events = stud.events.filter(date__year__range=[year_start, year_end])
+    stud.person.events = stud.person.events.filter(date__year__range=[year_start, year_end])
     stud.dopkas = stud.dopkas.filter(subject__semester=semester)
     stud.commissions = stud.commissions.filter(subject__semester=semester)
     stud.attendance = stud.attendance.filter(
