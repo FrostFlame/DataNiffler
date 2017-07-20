@@ -22,7 +22,7 @@ def person_student_save(ctx, request, person=None, student=None, magistr=None):
     ctx['magistr_form'] = MagistrForm(data=request.POST, instance=magistr)
     if ctx['person_form'].is_valid():
         person = ctx['person_form'].save()
-        if ctx['student_form'].is_valid():
+        if ctx['student_form'].is_valid() and ctx['student_form'].cleaned_data['group'] is not None:
             student = ctx['student_form'].save(**{'person': person})
             if ctx['magistr_form'].is_valid():
                 ctx['magistr_form'].save(**{'student': student})

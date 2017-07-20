@@ -45,7 +45,7 @@ def auth_login(request):
 
 @login_required(login_url=reverse_lazy('data:login'))
 def index(request):
-    return render(request, 'templates/index.html')
+    return render(request, 'itis_manage/index.html')
 
 
 def view_person(request, person_id="add"):
@@ -286,7 +286,7 @@ def add_scores(request):
                                                 MetaProgressPractice) if type == 'ekz' else get_dynamic_model_form(
                 ProgressForm, MetaExamPractice)
             students = Student.objects.filter(group=group,
-                                              person__status__name__contains='Студент' if not magister else 'Магистр', ). \
+                                              person__status__name__contains='Бакалавр' if not magister else 'Магистр', ). \
                 order_by('person__surname')
 
             semester_subjects = SemesterSubject.objects.filter(semester=int(semester)).order_by('subject__name')

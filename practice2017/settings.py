@@ -145,4 +145,5 @@ class Master(Base):
 class Dev(Base):
     config_parser.read(os.path.join(PRACTICE_2017_SYSTEM_PATH, 'practice.dev.cfg'))
     DEBUG = True
+    ALLOWED_HOSTS = ['*', ]
     DATABASES = get_database(config_parser, DEBUG)

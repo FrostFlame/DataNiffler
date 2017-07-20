@@ -105,6 +105,12 @@ class StudentForm(ReadOnlySupportMixin, forms.ModelForm):
         widgets = {'standing': autocomplete.ModelSelect2(),
                    'form_of_education': autocomplete.ListSelect2(), }
 
+    def __init__(self, *args, **kwargs):
+        super(StudentForm, self).__init__(*args, **kwargs)
+        self.fields['standing'].required = False
+        self.fields['group'].required = False
+        self.fields['form_of_education'].required = False
+
     def save(self, *args, **kwargs):
         if self.is_valid():
             student = super(StudentForm, self).save(commit=False)

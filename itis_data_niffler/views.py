@@ -74,7 +74,7 @@ def subject_rating(request):
     if 'subject' in request.GET:
         subject = Subject.objects.get(name=request.GET['subject'])
     else:
-        subject = Subject.objects.get(name='MATH')
+        subject = Subject.objects.get(name='Math')
     today_year = datetime.today()
     for student in Student.objects.all():
         semesters_for_subject = SemesterSubject.objects.all().filter(subject=subject).only(
