@@ -41,7 +41,7 @@ def auth_login(request):
 
 @login_required(login_url=reverse_lazy('data:login'))
 def index(request):
-    return HttpResponse("index")
+    return render(request, 'itis_manage/index.html')
 
 
 def view_person(request, person_id="add"):
