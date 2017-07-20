@@ -206,7 +206,7 @@ class LaboratoryRequest(models.Model):
     student = models.ForeignKey('Student', related_name='student_requests_for_labs')
     laboratory = models.ForeignKey(Laboratory, related_name='laboratory_requests')
     is_active = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=datetime.datetime.now, auto_created=True)
+    created_at = models.DateTimeField(default=datetime.datetime.now, auto_created=True, null=True, blank=True )
 
     def __str__(self):
         return self.student.person.__str__() + 'requested to lab ' + self.laboratory.__str__() + ' on ' + str(

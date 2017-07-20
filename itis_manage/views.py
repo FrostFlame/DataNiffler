@@ -45,7 +45,7 @@ def auth_login(request):
 
 @login_required(login_url=reverse_lazy('data:login'))
 def index(request):
-    return render(request, 'itis_manage/index.html')
+    return render(request, 'templates/index.html')
 
 
 def view_person(request, person_id="add"):
@@ -259,8 +259,11 @@ def lab_view(request, lab_id):
     return render(request, 'templates/add_lab.html', ctx)
 
 
-def lab_requests(request):
-    return HttpResponse('Lab requests')
+class LabRequests(ListView):
+    model = LaboratoryRequest
+    template_name = 'templates/lab_requests.html'
+    context_object_name = 'requests'
+    paginate_by = 50
 
 
 def view_persons(request):

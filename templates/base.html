@@ -129,7 +129,7 @@
                     <a href="{% url 'manage:index' %}"><i class="fa fa-fw fa-home"></i> Главная</a>
                 </li>
                 <li {% if request.resolver_match.url_name == 'add-theme-subjecy' %}class="active"{% endif %}>
-                    <a href="{% url 'manage:add-theme-subjecy' %}"><i class="fa fa-fw fa-chevron-circle-up"></i> Направление</a>
+                    <a href="{% url 'manage:add-theme-subjecy' %}"><i class="fa fa-fw fa-chevron-circle-up"></i>Темы для предмета</a>
                 </li>
                 <li {% if request.resolver_match.url_name == 'create-subject' %}class="active"{% endif %}>
                     <a href="{% url 'manage:create-subject' %}"><i class="fa fa-fw fa-book"></i> Предмет</a>

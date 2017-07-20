@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from itis_manage import views
 from itis_manage.models import Student, NGroup
-from itis_manage.views import add_subject, AddGroupView, EditGroupView, add_theme_subject
+from itis_manage.views import add_subject, AddGroupView, EditGroupView, add_theme_subject, LabRequests
 from itis_manage.ajax import *
 from itis_manage.views import add_subject
 
@@ -27,7 +27,7 @@ urlpatterns = [
 
     # Requests
     url(r'^request/lab/(?P<lab_id>(\d+)|add)$', views.lab_request, name='lab-request-add-edit-delete'),
-    url(r'^request/labs$', views.lab_requests, name='lab-requests'),
+    url(r'^request/labs$', LabRequests.as_view(), name='lab-requests'),
 
     # Progress(student balls :D)
     url(r'^scores/add/$', views.add_scores, name='add-scores'),
