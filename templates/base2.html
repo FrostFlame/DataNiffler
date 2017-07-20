@@ -1,0 +1,188 @@
+{#<button type="button" id="feedback-btn" class="btn btn-info vertical-right-aligned">#}
+{#    Feedback <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span>#}
+{#</button>#}
+
+
+{#{% block footer %}#}
+{#    {% include 'tellme.html' %}#}
+{#{% endblock %}#}
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>
+        {% block title %}
+            Data Niffler
+        {% endblock %}
+    </title>
+    <link rel="icon" href="{% static 'favicon.ico' %}">
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/select2.min.css' %}" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
+
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="{% static 'js/jquery-3.2.1.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/bootstrap.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/select2.min.js' %}"></script>
+
+    <link href="/static/autocomplete_light/vendor/select2/dist/css/select2.css" type="text/css" media="all"
+          rel="stylesheet"/>
+    <link href="/static/autocomplete_light/select2.css" type="text/css" media="all" rel="stylesheet"/>
+    <script type="text/javascript" src="/static/autocomplete_light/jquery.init.js"></script>
+    <script type="text/javascript" src="/static/autocomplete_light/autocomplete.init.js"></script>
+    <script type="text/javascript" src="/static/autocomplete_light/vendor/select2/dist/js/select2.full.js"></script>
+    <script type="text/javascript" src="/static/autocomplete_light/select2.js"></script>
+    <link href="/static/css/datetimepicker.css" type="text/css" media="all" rel="stylesheet"/>
+    <link href="{% static 'tellme/feedback.min.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript" src="/static/js/locales/bootstrap-datetimepicker.ru.js"></script>
+
+
+    {% block extrahead %}
+
+    {% endblock %}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            {% block document_ready %}
+            {% endblock %}
+        });
+    </script>
+
+
+    <script type="application/javascript">
+        $(function () {
+            {% block jquery %}
+            {% endblock %}
+        });
+    </script>
+</head>
+
+<body>
+
+<div id="wrapper">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <div class="logo">
+                <a class="" href="/">
+                    <img src="{% static 'img/logo.png' %}" style="width: 100%" alt="">
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Top Menu Items -->
+        <ul class="nav navbar-right top-nav">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> John Smith <b
+                        class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-fw fa-gear"></i> Settings</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="{% url 'data:logout' %}"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav side-nav">
+                <li>
+                    <a href="{% url 'manage:index' %}"><i class="fa fa-fw fa-home"></i> Главная</a>
+                </li>
+                <li {% if request.resolver_match.url_name == 'common-rating' %}class="active"{% endif %}>
+                    <a href="{% url 'data:common-rating' %}"><i class="fa fa-fw fa-star"></i> Общий рейтинг</a>
+                </li>
+                <li {% if request.resolver_match.url_name == 'subject-rating' %}class="active"{% endif %}>
+                    <a href="{% url 'data:subject-rating' %}"><i class="fa fa-fw fa-book"></i> Рейтинг по предмету</a>
+                </li>
+                <li {% if request.resolver_match.url_name == 'student-rating' %}class="active"{% endif %}>
+                    <a href="{% url 'data:student-rating' %}"><i class="fa fa-fw fa-users"></i> Рейтинг студентов</a>
+                </li>
+                <li {% if request.resolver_match.url_name == 'student-criteria' %}class="active"{% endif %}>
+                    <a href="{% url 'data:student-criteria' %}"><i class="fa fa-fw fa-user"></i> Статистика
+                        студентов</a>
+                </li>
+                <li {% if request.resolver_match.url_name == 'teacher-criteria' %}class="active"{% endif %}>
+                    <a href="{% url 'data:teacher-criteria' %}"><i class="fa fa-fw fa-male"></i> Рейтинг преподавателей</a>
+                </li>
+                <li {% if request.resolver_match.url_name == 'group-rating' %}class="active"{% endif %}>
+                    <a href="{% url 'data:group-rating' %}"><i class="fa fa-fw fa-users"></i> Рейтинг групп</a>
+                </li>
+                <li {% if request.resolver_match.url_name == 'lab-rating' %}class="active"{% endif %}>
+                    <a href="{% url 'data:lab-rating' %}"><i class="fa fa-fw fa-flask"></i> Рейтинг лабораторий</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </nav>
+
+    <div id="page-wrapper" class="full-h">
+        <div class="container-fluid">
+            {% block content %}
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            {% block page_title %}
+                                Заголовок страницы
+                            {% endblock %}
+                        </h1>
+                    </div>
+                </div>
+                <!-- /.row -->
+            {% endblock %}
+        </div>
+        <!-- /.container-fluid -->
+
+    </div>
+    <!-- /#page-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+</body>
+
+{% block script %}
+    <script type="application/javascript">
+    </script>
+{% endblock %}
+</html>

@@ -274,6 +274,7 @@ def add_scores(request):
     if request.POST:
         form = ctx['form'](request.POST)
         if form.is_valid():
+
             magister = form.cleaned_data['magister']
             group = form.cleaned_data['group']
             semester = form.cleaned_data['semester']
