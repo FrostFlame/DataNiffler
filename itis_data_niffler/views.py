@@ -104,7 +104,7 @@ def view_persons(request):
 
 
 def index(request):
-    return HttpResponse("index")
+    return render(request, 'templates/index.html')
 
 
 def lab_view(request, lab_id):

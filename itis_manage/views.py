@@ -33,8 +33,12 @@ def auth_login(request):
         return render(request, 'login.html', context={'form': form})
     else:
         form = UserForm(data=request.POST)
+        role = request.POST.get('role')
         if form.authorize(request):
-            return Redirect(reverse('manage:index'))
+            if role == 'A':
+                return Redirect(reverse('manage:index'))
+            if role == 'U':
+                return Redirect(reverse('data:index'))
         else:
             return render(request, 'login.html', {'form': form})
 

@@ -45,6 +45,8 @@ class Base(Configuration):
 
     ROOT_URLCONF = 'practice2017.urls'
 
+    LOGOUT_REDIRECT_URL = '/auth/login'
+
     INSTALLED_APPS1 = INSTALLED_APPS + (
         'django.contrib.admin',
         'django.contrib.auth',

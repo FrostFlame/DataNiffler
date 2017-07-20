@@ -18,3 +18,11 @@
 .grey {
     color: #505052;
 }
+
+.full-h {
+    min-height: calc(100vh - 50px);
+}
+
+.label-role {
+    color: white !important;
+}

@@ -1,4 +1,7 @@
+from django.conf import settings
 from django.conf.urls import include, url
+from django.contrib.auth.views import logout
+
 from itis_data_niffler.ajax import *
 from itis_manage import views as manage_views
 from itis_data_niffler import views
@@ -6,6 +9,7 @@ from itis_data_niffler import views
 urlpatterns = [
     # Auth
     url(r'^auth/login$', manage_views.auth_login, name='login'),
+    url(r'^auth/logout$', logout, {'next_page': settings.LOGOUT_REDIRECT_URL}, name='logout'),
 
     # Persons
     url(r'^person/(?P<person_id>(\d+))$', views.view_person, name='view-person'),
@@ -31,5 +35,5 @@ urlpatterns = [
     url(r'^ajax/students/stats/score$', get_filtered_students, name='get-filtered-students'),
 
     # Index
-    #url(r'', views.index, name='index'),
+    url(r'', views.index, name='index'),
 ]
