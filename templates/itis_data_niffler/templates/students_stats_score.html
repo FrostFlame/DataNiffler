@@ -95,7 +95,7 @@
                         <th>Имя</th>
                         <th>Группа</th>
                         {% for subject in student_subjects %}
-                            <th>{{ subject.subject.name }}</th>
+                            <th>{{ subject }}</th>
                         {% endfor %}
                         {% ifequal student_subjects|length 1 %}
                             {% else %}
@@ -116,7 +116,7 @@
                             <td>{% return_model_object_field model='Student' id=student_id field='person' %} </td>
                             <td>{% return_model_object_field model='Student' id=student_id field='group' %}</td>
                             {% for subject in student_subjects %}
-                                <td>{% progress_id_subject_id dict=student_extras subject_id=subject.subject.id %}</td>
+                                <td>{% progress_id_subject_id dict=student_extras subject_id=subject.id %}</td>
                             {% endfor %}
                             {% ifequal student_subjects|length 1 %}
                                 {% else %}

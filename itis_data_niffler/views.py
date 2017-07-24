@@ -12,7 +12,7 @@ from itis_data_niffler.forms import StudentStatsCriteriaForm, TeacherStatsCriter
 from itis_data_niffler.lib import semesters, diff_month, make_form, STUDENT_STATS_SCORE_FIELDS, stud_filter_data, \
     LAB_STATS_SCORE_FIELDS
 from itis_manage.forms import PersonForm, StudentForm, MagistrForm, LaboratoryForm, LabRequestForm
-from itis_manage.lib import get_unique_object_or_none, get_set_sem
+from itis_manage.lib import get_unique_object_or_none, get_set_sem, get_set_sem_on, get_list_aj, get_set_sem_on_2
 from itis_manage.models import Person, Student, Magistrate, Laboratory, LaboratoryRequest, NGroup, TeacherSubject, \
     AdditionalSession, Commission
 from itis_manage.models import SemesterSubject, Progress, Subject
@@ -141,7 +141,10 @@ def students_stats_score(request):
         ctx['form'] = form
         if form.is_valid():
             courses = form.cleaned_data['course']  # May list
-            semester = form.cleaned_data['semester']  # May 3 Both
+
+            semester = (1, 2) if form.cleaned_data['semester'] == '3' else form.cleaned_data['semester']  # May 3 Both
+
+            semesters_list = get_set_sem_on_2(courses, semester)  # List of all semesters in filter
             subjects = form.cleaned_data['subject']  # May list
             year_start, year_end = int(form.cleaned_data['date_begin']), int(form.cleaned_data['date_end'])
 
@@ -149,25 +152,29 @@ def students_stats_score(request):
             for i in courses:
                 for j in list(range(year_start, year_end)):
                     years_list.add(j - int(i) + 1)
+            # All subjects
+            ctx['student_subjects'] = SemesterSubject.objects.filter(subject__id__in=subjects,
+                                                                     semester__in=semesters_list).order_by('id')
             kwargs = {
                 'group__year_of_foundation__in': years_list,
                 'progresses__semester_subject__subject__in': subjects,
             }
             students = Student.objects.filter(**kwargs).order_by('progresses__semester_subject__subject')
             student_rating = {}
-            for student in students:
-                progresses = Progress.objects.filter(student=student, semester_subject__subject__in=subjects)
-                student_score = 0
-                student_rating[student.id] = {}
-                for p in progresses:
-                    student_score += p.total()
-                    student_rating[student.id].update({p.semester_subject.id: p.total()})
-                student_rating[student.id].update({'final': student_score / progresses.count()})
-            print(student_rating.items())
-            student_rating = sorted(student_rating.items(), key=lambda x: x[1]['final'], reverse=True)
-            ctx['student_rating'] = student_rating
-            ctx['student_subjects'] = SemesterSubject.objects.filter(id__in=subjects).order_by('id')
-            form.fields['subject'].queryset = form.cleaned_data['subject']
+            if ctx['student_subjects'].count() != 0:
+                for student in students:
+                    progresses = Progress.objects.filter(student=student, semester_subject__subject__in=subjects,
+                                                         semester_subject__semester__in=semesters_list)
+                    student_score = 0
+                    student_rating[student.id] = {}
+                    for p in progresses:
+                        student_score += p.total()
+                        student_rating[student.id].update({p.semester_subject.id: p.total()})
+                    student_rating[student.id].update({'final': student_score / ctx['student_subjects'].count()})
+                student_rating = sorted(student_rating.items(), key=lambda x: x[1]['final'], reverse=True)
+                ctx['student_rating'] = student_rating
+            # form.fields['subject'].queryset = form.cleaned_data['subject']
+            form.fields['subject'].queryset = Subject.objects.filter(subject_semesters__in=ctx['student_subjects'])
             ctx['form'] = form
     return render(request, 'itis_data_niffler/templates/students_stats_score.html', ctx)
 

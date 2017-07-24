@@ -15,6 +15,7 @@ class GetObjects(autocomplete.Select2QuerySetView, CustomLoginRequiredMixin):
 class CuratorAutocompleteView(autocomplete.Select2QuerySetView, CustomLoginRequiredMixin):
     queryset = Person.objects.filter(status__name="Куратор")
 
+
 @login_required()
 def get_subjects(request):
     course = request.GET.get('course_id', None)
@@ -26,5 +27,7 @@ def get_subjects(request):
             semesters = get_set_sem_on(courses, int(semester))
         else:
             semesters = get_set_sem(courses)
-        subjects = SemesterSubject.objects.filter(semester__in=semesters).values('subject__id', 'subject__name')
+        subjects = SemesterSubject.objects.filter(semester__in=semesters).order_by(
+            'subject__name')
+        subjects = ({'subject__id':s.subject.id,'subject__name':str(s)} for s in subjects)
         return JsonResponse(list(subjects), safe=False)

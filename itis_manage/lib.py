@@ -47,8 +47,8 @@ def get_list_aj(val):
 def get_set_sem(val):
     c = []
     for i in val:
-        c.append((i - 1) * 2 + 1)
-        c.append((i - 1) * 2 + 2)
+        c.append((int(i) - 1) * 2 + 1)
+        c.append((int(i) - 1) * 2 + 2)
     return c
 
 
@@ -56,4 +56,12 @@ def get_set_sem_on(val, sem):
     c = []
     for i in val:
         c.append((i - 1) * 2 + sem)
+    return c
+
+
+def get_set_sem_on_2(val, sem):
+    c = []
+    for i in val:
+        for s in sem:
+            c.append((int(i) - 1) * 2 + int(s))
     return c
